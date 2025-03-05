@@ -79,6 +79,9 @@ class PPO_Track(object):
         self.batch_size = self.horizon_length * self.num_actors
         self.minibatch_size = self.ppo_config['minibatch_size']
         self.mini_epochs_num = self.ppo_config['mini_epochs']
+        # self.batch_size = self.horizon_length * self.num_actors
+        # num_actors = num_envs
+        # minibatch_size = 512
         assert self.batch_size % self.minibatch_size == 0 or full_config.test
         # ---- scheduler ----
         self.lr_schedule = self.ppo_config['lr_schedule']
