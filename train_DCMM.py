@@ -12,6 +12,8 @@ from gym_dcmm.utils.util import omegaconf_to_dict
 from gym_dcmm.algs.ppo_dcmm.ppo_dcmm_catch_two_stage import PPO_Catch_TwoStage
 from gym_dcmm.algs.ppo_dcmm.ppo_dcmm_catch_one_stage import PPO_Catch_OneStage
 from gym_dcmm.algs.ppo_dcmm.ppo_dcmm_track import PPO_Track
+from gym_dcmm.algs.ppo_dcmm.ppo_dcmm_trace import PPO_Trace
+
 import gymnasium as gym
 import gym_dcmm
 import datetime
@@ -32,6 +34,9 @@ def main(config: DictConfig):
         and config.checkpoint_catching:
         config.checkpoint_catching = to_absolute_path(config.checkpoint_catching)
         model_path = config.checkpoint_catching
+    elif (config.task == 'Tracing' and config.checkpoint_tracing):
+        config.checkpoint_tracing = to_absolute_path(config.checkpoint_tracing)
+        model_path = config.checkpoint_tracing
 
     # use the device for rl
     config.rl_device = f'cuda:{config.device_id}' if config.device_id >= 0 else 'cpu'
@@ -40,7 +45,12 @@ def main(config: DictConfig):
     cprint('Start Building the Environment', 'green', attrs=['bold'])
     # Create and wrap the environment
     env_name = 'gym_dcmm/DcmmVecWorld-v0'
-    task = 'Tracking' if config.task == 'Tracking' else 'Catching'
+    if config.task == 'Tracking':
+        task = 'Tracking'
+    elif config.task == 'Tracing':
+        task = 'Tracing'
+    else:
+        task = 'Catching'
     print("config.num_envs: ", config.num_envs)
     env = gym.make_vec(env_name, num_envs=int(config.num_envs), 
                     task=task, camera_name=["top"],
@@ -56,15 +66,17 @@ def main(config: DictConfig):
 
     output_dif = os.path.join('outputs', config.output_name)
     # Get the local date and time
-    local_tz = pytz.timezone('Asia/Shanghai')
+    local_tz = pytz.timezone('America/New_York')
     current_datetime = datetime.datetime.now().astimezone(local_tz)
     current_datetime_str = current_datetime.strftime("%Y-%m-%d/%H:%M:%S")
     output_dif = os.path.join(output_dif, current_datetime_str)
     os.makedirs(output_dif, exist_ok=True)
 
     PPO = PPO_Track if config.task == 'Tracking' else \
+          PPO_Trace if config.task == 'Tracing' else \
           PPO_Catch_TwoStage if config.task == 'Catching_TwoStage' else \
           PPO_Catch_OneStage
+    
     agent = PPO(env, output_dif, full_config=config)
 
     cprint('Start Training/Testing the Agent', 'green', attrs=['bold'])
