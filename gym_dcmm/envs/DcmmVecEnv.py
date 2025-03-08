@@ -238,9 +238,14 @@ class DcmmVecEnv(gym.Env):
         # Combine the limits of the action space
         self.actions_low = np.concatenate([base_low, arm_low, hand_low])
         self.actions_high = np.concatenate([base_high, arm_high, hand_high])
-
+        
+        # self.obs_dim:  36
+        # self.act_dim:  18
         self.obs_dim = get_total_dimension(self.observation_space)
         self.act_dim = get_total_dimension(self.action_space)
+        print("self.obs_dim: ", self.obs_dim)
+        print("self.act_dim: ", self.act_dim)
+
         self.obs_t_dim = self.obs_dim - 12 - 6  # dim = 18, 12 for the hand, 6 for the arm joint positions
         self.act_t_dim = self.act_dim - 12 # dim = 6, 12 for the hand
         self.obs_c_dim = self.obs_dim - 6  # dim = 30, 6 for the arm joint positions

@@ -284,6 +284,9 @@ class MJ_DCMM(object):
     def set_throw_pos_vel(self, 
                           pose = np.array([0, 0, 0, 1, 0, 0, 0]), 
                           velocity = np.array([0, 0, 0, 0, 0, 0])):
+        # 44, 42
+        # print(len(self.data.qpos))
+        # print(len(self.data.qvel))
         self.data.qpos[37:44] = pose
         self.data.qvel[36:42] = velocity
 
