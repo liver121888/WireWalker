@@ -4,10 +4,11 @@ Version@2024-10-17
 All Rights Reserved
 ABOUT: this file constains the basic class of the DexCatch with Mobile Manipulation (DCMM) in the MuJoCo simulation environment.
 """
+
 import os, sys
 sys.path.append(os.path.abspath('../'))
 import copy
-import configs.env.DcmmCfg as DcmmCfg
+import configs.env.WireWalkerCfg as WireWalkerCfg
 import mujoco
 from utils.util import calculate_arm_Te
 from utils.pid import PID
@@ -37,7 +38,7 @@ DEBUG_ARM = False
 DEBUG_BASE = False
 
 
-class MJ_DCMM(object):
+class MJ_WireWalker(object):
     """
     Class of the DexCatch with Mobile Manipulation (DCMM)
     in the MuJoCo simulation environment.
@@ -62,13 +63,13 @@ class MJ_DCMM(object):
         self.open_viewer = viewer
         # Load the MuJoCo model
         if model is None:
-            if not object_eval: model_path = os.path.join(DcmmCfg.ASSET_PATH, DcmmCfg.XML_DCMM_LEAP_OBJECT_PATH)
-            else: model_path = os.path.join(DcmmCfg.ASSET_PATH, DcmmCfg.XML_DCMM_LEAP_UNSEEN_OBJECT_PATH)
+            if not object_eval: model_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_DCMM_LEAP_OBJECT_PATH)
+            else: model_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_DCMM_LEAP_UNSEEN_OBJECT_PATH)
             self.model_xml_string = xml_to_string(model_path)
         else:
             self.model = model
         if model_arm is None:
-            model_arm_path = os.path.join(DcmmCfg.ASSET_PATH, DcmmCfg.XML_ARM_PATH)
+            model_arm_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_ARM_PATH)
             self.model_arm = mujoco.MjModel.from_xml_path(model_arm_path)
         else:
             self.model_arm = model_arm
@@ -77,13 +78,15 @@ class MJ_DCMM(object):
         self.model_arm.opt.timestep = timestep
         self.data = mujoco.MjData(self.model)
         self.data_arm = mujoco.MjData(self.model_arm)
-        self.data.qpos[15:21] = DcmmCfg.arm_joints[:]
-        self.data.qpos[21:37] = DcmmCfg.hand_joints[:]
-        self.data_arm.qpos[0:6] = DcmmCfg.arm_joints[:]
+        self.data.qpos[15:21] = WireWalkerCfg.arm_joints[:]
+        # self.data.qpos[21:37] = WireWalkerCfg.hand_joints[:]
+        self.data_arm.qpos[0:6] = WireWalkerCfg.arm_joints[:]
 
         mujoco.mj_forward(self.model, self.data)
         mujoco.mj_forward(self.model_arm, self.data_arm)
         self.arm_base_pos = self.data.body("arm_base").xpos
+
+        # TODO: need to offset to the whoop
         self.current_ee_pos = copy.deepcopy(self.data_arm.body("link6").xpos)
         self.current_ee_quat = copy.deepcopy(self.data_arm.body("link6").xquat)
 
@@ -97,17 +100,17 @@ class MJ_DCMM(object):
             raise ValueError
         self.object_name = object_name
         # Get the geom id of the hand, the floor and the object
-        self.hand_start_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, 'mcp_joint') - 1
+        # self.hand_start_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, 'mcp_joint') - 1
         self.floor_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, 'floor')
         self.object_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, self.object_name)
 
         # Mobile Base Control
         self.rp_base = np.zeros(3)
         self.rp_ref_base = np.zeros(3)
-        self.drive_pid = PID("drive", DcmmCfg.Kp_drive, DcmmCfg.Ki_drive, DcmmCfg.Kd_drive, dim=4, llim=DcmmCfg.llim_drive, ulim=DcmmCfg.ulim_drive, debug=False)
-        self.steer_pid = PID("steer", DcmmCfg.Kp_steer, DcmmCfg.Ki_steer, DcmmCfg.Kd_steer, dim=4, llim=DcmmCfg.llim_steer, ulim=DcmmCfg.ulim_steer, debug=False)
-        self.arm_pid = PID("arm", DcmmCfg.Kp_arm, DcmmCfg.Ki_arm, DcmmCfg.Kd_arm, dim=6, llim=DcmmCfg.llim_arm, ulim=DcmmCfg.ulim_arm, debug=False)
-        self.hand_pid = PID("hand", DcmmCfg.Kp_hand, DcmmCfg.Ki_hand, DcmmCfg.Kd_hand, dim=16, llim=DcmmCfg.llim_hand, ulim=DcmmCfg.ulim_hand, debug=False)
+        self.drive_pid = PID("drive", WireWalkerCfg.Kp_drive, WireWalkerCfg.Ki_drive, WireWalkerCfg.Kd_drive, dim=4, llim=WireWalkerCfg.llim_drive, ulim=WireWalkerCfg.ulim_drive, debug=False)
+        self.steer_pid = PID("steer", WireWalkerCfg.Kp_steer, WireWalkerCfg.Ki_steer, WireWalkerCfg.Kd_steer, dim=4, llim=WireWalkerCfg.llim_steer, ulim=WireWalkerCfg.ulim_steer, debug=False)
+        self.arm_pid = PID("arm", WireWalkerCfg.Kp_arm, WireWalkerCfg.Ki_arm, WireWalkerCfg.Kd_arm, dim=6, llim=WireWalkerCfg.llim_arm, ulim=WireWalkerCfg.ulim_arm, debug=False)
+        # self.hand_pid = PID("hand", WireWalkerCfg.Kp_hand, WireWalkerCfg.Ki_hand, WireWalkerCfg.Kd_hand, dim=16, llim=WireWalkerCfg.llim_hand, ulim=WireWalkerCfg.ulim_hand, debug=False)
         self.cmd_lin_y = 0.0
         self.cmd_lin_x = 0.0
         self.arm_act = False
@@ -115,22 +118,22 @@ class MJ_DCMM(object):
         self.drive_vel = np.array([0.0, 0.0, 0.0, 0.0])
 
         ## Define Inverse Kinematics Solver for the Arm
-        self.ik_arm = IKArm(solver_type=DcmmCfg.ik_config["solver_type"], ilimit=DcmmCfg.ik_config["ilimit"], 
-                            ps=DcmmCfg.ik_config["ps"], λΣ=DcmmCfg.ik_config["λΣ"], tol=DcmmCfg.ik_config["ee_tol"])
+        self.ik_arm = IKArm(solver_type=WireWalkerCfg.ik_config["solver_type"], ilimit=WireWalkerCfg.ik_config["ilimit"], 
+                            ps=WireWalkerCfg.ik_config["ps"], λΣ=WireWalkerCfg.ik_config["λΣ"], tol=WireWalkerCfg.ik_config["ee_tol"])
 
         ## Initialize the camera parameters
-        self.model.vis.global_.offwidth = DcmmCfg.cam_config["width"]
-        self.model.vis.global_.offheight = DcmmCfg.cam_config["height"]
-        self.create_camera_data(DcmmCfg.cam_config["width"], DcmmCfg.cam_config["height"], DcmmCfg.cam_config["name"])
+        self.model.vis.global_.offwidth = WireWalkerCfg.cam_config["width"]
+        self.model.vis.global_.offheight = WireWalkerCfg.cam_config["height"]
+        self.create_camera_data(WireWalkerCfg.cam_config["width"], WireWalkerCfg.cam_config["height"], WireWalkerCfg.cam_config["name"])
 
         ## Initialize the target velocity of the mobile base
         self.target_base_vel = np.zeros(3)
         self.target_arm_qpos = np.zeros(6)
-        self.target_hand_qpos = np.zeros(16)
+        # self.target_hand_qpos = np.zeros(16)
         ## Initialize the target joint positions of the arm
-        self.target_arm_qpos[:] = DcmmCfg.arm_joints[:]
+        self.target_arm_qpos[:] = WireWalkerCfg.arm_joints[:]
         ## Initialize the target joint positions of the hand
-        self.target_hand_qpos[:] = DcmmCfg.hand_joints[:]
+        # self.target_hand_qpos[:] = WireWalkerCfg.hand_joints[:]
 
         self.ik_solution = np.zeros(6)
 
@@ -244,6 +247,7 @@ class MJ_DCMM(object):
         
         return mv_steer, mv_drive
     
+    # TODO: need to offset for the whoop
     def move_ee_pose(self, delta_pose):
         """
         Move the end-effector to the target pose.
@@ -284,27 +288,34 @@ class MJ_DCMM(object):
     def set_throw_pos_vel(self, 
                           pose = np.array([0, 0, 0, 1, 0, 0, 0]), 
                           velocity = np.array([0, 0, 0, 0, 0, 0])):
-        self.data.qpos[37:44] = pose
-        self.data.qvel[36:42] = velocity
+        # self.data.qpos[37:44] = pose
+        # self.data.qvel[36:42] = velocity
+        # start from -12
 
-    def action_hand2qpos(self, action_hand):
-        """
-        Convert the action of the hand to the joint positions.
-        """
-        # Thumb
-        self.target_hand_qpos[13] += action_hand[9]
-        self.target_hand_qpos[14] += action_hand[10]
-        self.target_hand_qpos[15] += action_hand[11]
-        # Other Three Fingers
-        self.target_hand_qpos[0] += action_hand[0]
-        self.target_hand_qpos[2] += action_hand[1]
-        self.target_hand_qpos[3] += action_hand[2]
-        self.target_hand_qpos[4] += action_hand[3]
-        self.target_hand_qpos[6] += action_hand[4]
-        self.target_hand_qpos[7] += action_hand[5]
-        self.target_hand_qpos[8] += action_hand[6]
-        self.target_hand_qpos[10] += action_hand[7]
-        self.target_hand_qpos[11] += action_hand[8]
+        # 28, 26
+        # print(len(self.data.qpos))
+        # print(len(self.data.qvel))
+        self.data.qpos[21:28] = pose
+        self.data.qvel[20:26] = velocity
+
+    # def action_hand2qpos(self, action_hand):
+    #     """
+    #     Convert the action of the hand to the joint positions.
+    #     """
+    #     # Thumb
+    #     self.target_hand_qpos[13] += action_hand[9]
+    #     self.target_hand_qpos[14] += action_hand[10]
+    #     self.target_hand_qpos[15] += action_hand[11]
+    #     # Other Three Fingers
+    #     self.target_hand_qpos[0] += action_hand[0]
+    #     self.target_hand_qpos[2] += action_hand[1]
+    #     self.target_hand_qpos[3] += action_hand[2]
+    #     self.target_hand_qpos[4] += action_hand[3]
+    #     self.target_hand_qpos[6] += action_hand[4]
+    #     self.target_hand_qpos[7] += action_hand[5]
+    #     self.target_hand_qpos[8] += action_hand[6]
+    #     self.target_hand_qpos[10] += action_hand[7]
+    #     self.target_hand_qpos[11] += action_hand[8]
 
     def pixel_2_world(self, pixel_x, pixel_y, depth, camera="top"):
         """
@@ -318,7 +329,7 @@ class MJ_DCMM(object):
         """
 
         if not self.cam_init:
-            self.create_camera_data(DcmmCfg.cam_config["width"], DcmmCfg.cam_config["height"], camera)
+            self.create_camera_data(WireWalkerCfg.cam_config["width"], WireWalkerCfg.cam_config["height"], camera)
 
         # Create coordinate vector
         pixel_coord = np.array([pixel_x, 
@@ -367,3 +378,10 @@ class MJ_DCMM(object):
         # Position of camera in world coordinates
         self.cam_pos = self.model.cam_pos0[cam_id] + self.data.body("base_link").xpos - self.data.body("arm_base").xpos
         self.cam_init = True
+
+# test code
+if __name__ == "__main__":
+    print("Testing the WireWalker model...")
+    dcmm = MJ_WireWalker()
+    dcmm.show_model_info()
+    print("Model loaded successfully!")

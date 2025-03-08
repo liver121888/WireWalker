@@ -44,7 +44,7 @@ reward_weights = {
     "r_ctrl": {
         'base': 0.2,
         'arm': 1.0,
-        'hand': 0.2,
+        # 'hand': 0.2,
     },
     "r_collision": -10.0,
 }
@@ -87,32 +87,36 @@ k_steer = np.array([0.75, 1.25])
 ## Arm Joints
 k_arm = np.array([0.75, 1.25])
 ## Hand Joints
-k_hand = np.array([0.75, 1.25])
+# k_hand = np.array([0.75, 1.25])
 ## Object Shape and Size
-# object_shape = ["box", "cylinder", "sphere", "ellipsoid", "capsule"]
-# object_mesh = ["bottle_mesh", "bread_mesh", "bowl_mesh", "cup_mesh", "winnercup_mesh"]
-# object_size = {
-#     "sphere": np.array([[0.035, 0.045]]),
-#     "capsule": np.array([[0.025, 0.035], [0.025, 0.04]]),
-#     "cylinder": np.array([[0.025, 0.035], [0.025, 0.035]]),
-#     "box": np.array([[0.025, 0.035], [0.025, 0.035], [0.025, 0.035]]),
-#     "ellipsoid": np.array([[0.03, 0.03], [0.045, 0.045], [0.045, 0.045]]),
-# }
-# object_mass = np.array([0.035, 0.075])
-# object_damping = np.array([5e-3, 2e-2])
+object_shape = ["box", "cylinder", "sphere", "ellipsoid", "capsule"]
+object_mesh = ["bottle_mesh", "bread_mesh", "bowl_mesh", "cup_mesh", "winnercup_mesh"]
+object_size = {
+    "sphere": np.array([[0.035, 0.045]]),
+    "capsule": np.array([[0.025, 0.035], [0.025, 0.04]]),
+    "cylinder": np.array([[0.025, 0.035], [0.025, 0.035]]),
+    "box": np.array([[0.025, 0.035], [0.025, 0.035], [0.025, 0.035]]),
+    "ellipsoid": np.array([[0.03, 0.03], [0.045, 0.045], [0.045, 0.045]]),
+}
+object_mass = np.array([0.035, 0.075])
+object_damping = np.array([5e-3, 2e-2])
+
 # object_static = np.array([0.5, 0.75])
+# throw between the time
+object_static = np.array([1.5, 2.0])
+
 ## Observation Noise
 k_obs_base = 0.01
 k_obs_arm = 0.001
 k_obs_object = 0.01
-k_obs_hand = 0.01
+# k_obs_hand = 0.01
 ## Actions Noise
 k_act = 0.025
 ## Action Delay
 act_delay = {
     'base': [1,],
     'arm': [1,],
-    'hand': [1,],
+    # 'hand': [1,],
 }
 
 ## Define PID params for wheel drive and steering. 
@@ -136,18 +140,18 @@ Kd_arm = np.array([40.0, 40.0, 40.0, 5.0, 10.0, 1])
 llim_arm = np.array([-300.0, -300.0, -300.0, -50.0, -50.0, -20.0])
 ulim_arm = np.array([300.0, 300.0, 300.0, 50.0, 50.0, 20.0])
 
-Kp_hand = np.array([4e-1, 1e-2, 2e-1, 2e-1,
-                      4e-1, 1e-2, 2e-1, 2e-1,
-                      4e-1, 1e-2, 2e-1, 2e-1,
-                      1e-1, 1e-1, 1e-1, 1e-2,])
-Ki_hand = 1e-2
-Kd_hand = np.array([3e-2, 1e-3, 2e-3, 1e-3,
-                      3e-2, 1e-3, 2e-3, 1e-3,
-                      3e-2, 1e-3, 2e-3, 1e-3,
-                      1e-2, 1e-2, 2e-2, 1e-3,])
-llim_hand = -5.0
-ulim_hand = 5.0
-hand_mask = np.array([1, 0, 1, 1,
-                      1, 0, 1, 1,
-                      1, 0, 1, 1,
-                      0, 1, 1, 1])
+# Kp_hand = np.array([4e-1, 1e-2, 2e-1, 2e-1,
+#                       4e-1, 1e-2, 2e-1, 2e-1,
+#                       4e-1, 1e-2, 2e-1, 2e-1,
+#                       1e-1, 1e-1, 1e-1, 1e-2,])
+# Ki_hand = 1e-2
+# Kd_hand = np.array([3e-2, 1e-3, 2e-3, 1e-3,
+#                       3e-2, 1e-3, 2e-3, 1e-3,
+#                       3e-2, 1e-3, 2e-3, 1e-3,
+#                       1e-2, 1e-2, 2e-2, 1e-3,])
+# llim_hand = -5.0
+# ulim_hand = 5.0
+# hand_mask = np.array([1, 0, 1, 1,
+#                       1, 0, 1, 1,
+#                       1, 0, 1, 1,
+#                       0, 1, 1, 1])
