@@ -378,10 +378,3 @@ class MJ_WireWalker(object):
         # Position of camera in world coordinates
         self.cam_pos = self.model.cam_pos0[cam_id] + self.data.body("base_link").xpos - self.data.body("arm_base").xpos
         self.cam_init = True
-
-# test code
-if __name__ == "__main__":
-    print("Testing the WireWalker model...")
-    dcmm = MJ_WireWalker()
-    dcmm.show_model_info()
-    print("Model loaded successfully!")
