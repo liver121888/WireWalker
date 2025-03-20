@@ -86,9 +86,10 @@ class MJ_WireWalker(object):
         mujoco.mj_forward(self.model_arm, self.data_arm)
         self.arm_base_pos = self.data.body("arm_base").xpos
 
-        # TODO: need to offset to the whoop
-        self.current_ee_pos = copy.deepcopy(self.data_arm.body("link6").xpos)
-        self.current_ee_quat = copy.deepcopy(self.data_arm.body("link6").xquat)
+        self.ee_link_name = "link_ee"
+
+        self.current_ee_pos = copy.deepcopy(self.data_arm.body(self.ee_link_name).xpos)
+        self.current_ee_quat = copy.deepcopy(self.data_arm.body(self.ee_link_name).xquat)
 
         ## Get the joint ID for the body, base, arm, hand and object
         # Note: The joint id of the mm body is 0 by default
@@ -247,7 +248,6 @@ class MJ_WireWalker(object):
         
         return mv_steer, mv_drive
     
-    # TODO: need to offset for the whoop
     def move_ee_pose(self, delta_pose):
         """
         Move the end-effector to the target pose.
@@ -257,8 +257,8 @@ class MJ_WireWalker(object):
         Return:
         - The target joint positions of the arm
         """
-        self.current_ee_pos[:] = self.data_arm.body("link6").xpos[:]
-        self.current_ee_quat[:] = self.data_arm.body("link6").xquat[:]
+        self.current_ee_pos[:] = self.data_arm.body(self.ee_link_name).xpos[:]
+        self.current_ee_quat[:] = self.data_arm.body(self.ee_link_name).xquat[:]
         target_pos = self.current_ee_pos + delta_pose[0:3]
         r_delta = R.from_euler('zxy', delta_pose[3:6])
         r_current = R.from_quat(self.current_ee_quat)

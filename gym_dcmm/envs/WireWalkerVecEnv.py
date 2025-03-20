@@ -147,6 +147,9 @@ class WireWalkerVecEnv(gym.Env):
         self.object_throw = False
         self.object_train = True
         if object_eval: self.set_object_eval()
+
+        self.ee_link_name = "link_ee"
+
         self.WireWalker.model_xml_string = self._reset_object()
         self.WireWalker.model = mujoco.MjModel.from_xml_string(self.WireWalker.model_xml_string)
         self.WireWalker.data = mujoco.MjData(self.WireWalker.model)
@@ -278,9 +281,9 @@ class WireWalkerVecEnv(gym.Env):
         self.vel_history = deque(maxlen=4)
 
         self.info = {
-            "ee_distance": np.linalg.norm(self.WireWalker.data.body("link6").xpos - 
+            "ee_distance": np.linalg.norm(self.WireWalker.data.body(self.ee_link_name).xpos - 
                                           self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:3]),
-            "base_distance": np.linalg.norm(self.WireWalker.data.body("arm_base").xpos[0:2] - 
+            "base_distance": np.linalg.norm(self.WireWalker.data.body(self.ee_link_name).xpos[0:2] - 
                                             self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:2]),
             "env_time": self.WireWalker.data.time - self.start_time,
             "imgs": {}
@@ -376,21 +379,29 @@ class WireWalkerVecEnv(gym.Env):
         # Caclulate the ee_pos3d w.r.t. the base_link
         base_yaw = quat2theta(self.WireWalker.data.body("base_link").xquat[0], self.WireWalker.data.body("base_link").xquat[3])
         x,y = relative_position(self.WireWalker.data.body("arm_base").xpos[0:2], 
-                                self.WireWalker.data.body("link6").xpos[0:2], 
+                                self.WireWalker.data.body(self.ee_link_name).xpos[0:2], 
                                 base_yaw)
         return np.array([x, y, 
-                         self.WireWalker.data.body("link6").xpos[2]-self.WireWalker.data.body("arm_base").xpos[2]])
+                         self.WireWalker.data.body(self.ee_link_name).xpos[2]-self.WireWalker.data.body("arm_base").xpos[2]])
 
     def _get_relative_ee_quat(self):
-        # Caclulate the ee_pos3d w.r.t. the base_link
-        quat = relative_quaternion(self.WireWalker.data.body("base_link").xquat, self.WireWalker.data.body("link6").xquat)
+        # Caclulate the ee_quat w.r.t. the base_link
+        quat = relative_quaternion(self.WireWalker.data.body("base_link").xquat, self.WireWalker.data.body(self.ee_link_name).xquat)
         return np.array(quat)
+    
+    def _get_absolute_ee_pos3d(self):
+        # Caclulate the absolute ee_pos3d
+        return np.array([self.WireWalker.data.body(self.ee_link_name).xpos])
+
+    def _get_absolute_ee_quat(self):
+        # Caclulate the absolute ee_quat
+        return np.array([self.WireWalker.data.body(self.ee_link_name).xquat])
 
     def _get_relative_ee_v_lin_3d(self):
         # Caclulate the ee_v_lin3d w.r.t. the base_link
         # In simulation, we can directly get the velocity of the end-effector
         base_vel = self.WireWalker.data.body("arm_base").cvel[3:6]
-        global_ee_v_lin = self.WireWalker.data.body("link6").cvel[3:6]
+        global_ee_v_lin = self.WireWalker.data.body(self.ee_link_name).cvel[3:6]
         base_yaw = quat2theta(self.WireWalker.data.body("base_link").xquat[0], self.WireWalker.data.body("base_link").xquat[3])
         ee_v_lin_x = math.cos(base_yaw) * (global_ee_v_lin[0]-base_vel[0]) + math.sin(base_yaw) * (global_ee_v_lin[1]-base_vel[1])
         ee_v_lin_y = -math.sin(base_yaw) * (global_ee_v_lin[0]-base_vel[0]) + math.cos(base_yaw) * (global_ee_v_lin[1]-base_vel[1])
@@ -466,15 +477,21 @@ class WireWalkerVecEnv(gym.Env):
     def _get_info(self):
         # Time of the Mujoco environment
         env_time = self.WireWalker.data.time - self.start_time
-        ee_distance = np.linalg.norm(self.WireWalker.data.body("link6").xpos - 
+        ee_distance = np.linalg.norm(self.WireWalker.data.body(self.ee_link_name).xpos - 
                                     self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:3])
         base_distance = np.linalg.norm(self.WireWalker.data.body("arm_base").xpos[0:2] -
                                         self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:2])
         # print("base_distance: ", base_distance)
+
+        ee_abs_pose = self._get_absolute_ee_pos3d()
+        ee_abs_quat = self._get_absolute_ee_quat()
+
         if self.print_info: 
             print("##### print info")
             print("env_time: ", env_time)
             print("ee_distance: ", ee_distance)
+            print("ee_abs_pose: ", ee_abs_pose)
+            print("ee_abs_quat: ", ee_abs_quat)
         return {
             # Get contact point from the mujoco model
             "env_time": env_time,
@@ -647,9 +664,9 @@ class WireWalkerVecEnv(gym.Env):
         self.reward_stability = 0
 
         self.info = {
-            "ee_distance": np.linalg.norm(self.WireWalker.data.body("link6").xpos - 
+            "ee_distance": np.linalg.norm(self.WireWalker.data.body(self.ee_link_name).xpos - 
                                        self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:3]),
-            "base_distance": np.linalg.norm(self.WireWalker.data.body("arm_base").xpos[0:2] -
+            "base_distance": np.linalg.norm(self.WireWalker.data.body(self.ee_link_name).xpos[0:2] -
                                              self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:2]),
             "evn_time": self.WireWalker.data.time - self.start_time,
         }
@@ -1020,12 +1037,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Args for WireWalkerVecEnv")
     parser.add_argument('--viewer', action='store_true', help="open the mujoco.viewer or not")
     parser.add_argument('--imshow_cam', action='store_true', help="imshow the camera image or not")
+    parser.add_argument('--task', type=str, default='Tracking', help="Task for the WireWalkerEnv")
+    parser.add_argument('--print_reward', action='store_true', help="print the reward or not")
+    parser.add_argument('--print_info', action='store_true', help="print the info or not")
+    parser.add_argument('--print_contacts', action='store_true', help="print the contacts or not")
+    parser.add_argument('--print_ctrl', action='store_true', help="print the ctrl or not")
+    parser.add_argument('--print_obs', action='store_true', help="print the observation or not")
     args = parser.parse_args()
     print("args: ", args)
-    env = WireWalkerVecEnv(task='Tracking', object_name='object', render_per_step=False, 
-                    print_reward=False, print_info=False, 
-                    print_contacts=False, print_ctrl=False, 
-                    print_obs=False, camera_name = ["top"],
+    env = WireWalkerVecEnv(task=args.task, object_name='object', render_per_step=False, 
+                    print_reward=args.print_reward, print_info=args.print_info, 
+                    print_contacts=args.print_contacts, print_ctrl=args.print_ctrl, 
+                    print_obs=args.print_obs, camera_name = ["top"],
                     render_mode="rgb_array", imshow_cam=args.imshow_cam, 
                     viewer = args.viewer, object_eval=False,
                     env_time = 2.5, steps_per_policy=20)
