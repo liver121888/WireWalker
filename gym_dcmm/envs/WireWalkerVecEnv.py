@@ -1003,7 +1003,8 @@ class WireWalkerVecEnv(gym.Env):
     def run_test(self):
         global cmd_lin_x, cmd_lin_y, trigger_delta, trigger_delta_hand, delta_xyz, delta_xyz_hand
         self.reset()
-        action = np.zeros(18)
+        # action = np.zeros(18)
+        action = np.zeros(6)
         while True:
             # Note: action's dim = 18, which includes 2 for the base, 4 for the arm, and 12 for the hand
             # print("##### stage: ", self.stage)
@@ -1015,19 +1016,20 @@ class WireWalkerVecEnv(gym.Env):
                 trigger_delta = False
             else:
                 action[2:6] = np.zeros(4)
-            if trigger_delta_hand:
-                print("delta_xyz_hand: ", delta_xyz_hand)
-                action[6:18] = np.ones(12)*delta_xyz_hand
-                trigger_delta_hand = False
-            else:
-                action[6:18] = np.zeros(12)
+            
+            # if trigger_delta_hand:
+            #     print("delta_xyz_hand: ", delta_xyz_hand)
+            #     action[6:18] = np.ones(12)*delta_xyz_hand
+            #     trigger_delta_hand = False
+            # else:
+            #     action[6:18] = np.zeros(12)
             base_tensor = action[:2]
             arm_tensor = action[2:6]
-            hand_tensor = action[6:18]
+            # hand_tensor = action[6:18]
             actions_dict = {
                 'arm': arm_tensor,
                 'base': base_tensor,
-                'hand': hand_tensor
+                # 'hand': hand_tensor
             }
             # print("self.WireWalker.data.body('link6'):", self.WireWalker.data.body('link6'))
             observation, reward, terminated, truncated, info = self.step(actions_dict)

@@ -213,6 +213,7 @@ class QP(IK):
         self.name = f"QP (λj={λj}, λs={λs})"
         self.λj = λj
         self.λs = λs
+        self.ee_link = "link_ee"
 
         if self.λΣ > 0.0:
             self.name += ' Σ'
@@ -229,7 +230,7 @@ class QP(IK):
         # Do not use mj_kinematics, it does more than foward the position kinematics!
         # mujoco.mj_kinematics(model, data)
         mujoco.mj_fwdPosition(model, data)
-        Te = calculate_arm_Te(data.body("link6").xpos, data.body("link6").xquat)
+        Te = calculate_arm_Te(data.body(self.ee_link).xpos, data.body(self.ee_link).xquat)
         # print("Tep: ", Tep)
         # print("Te: ", Te)
         # exit(1)
@@ -243,7 +244,7 @@ class QP(IK):
         # Calculate the Jacobian
         jacp = np.zeros((3, model.nv))
         jacr = np.zeros((3, model.nv))
-        mujoco.mj_jacBodyCom(model, data, jacp, jacr, model.body("link6").id)
+        mujoco.mj_jacBodyCom(model, data, jacp, jacr, model.body(self.ee_link).id)
         J = np.concatenate((jacp, jacr), axis=0)
         # print("J: \n", J)
         # Quadratic component of objective function
@@ -404,9 +405,9 @@ class LM_Chan(IK):
         # mujoco.mj_kinematics(model, data)
         mujoco.mj_fwdPosition(model, data)
         Te = np.eye(4)
-        Te[:3,3] = data.body("link6").xpos
+        Te[:3,3] = data.body(self.ee_link).xpos
         res = np.zeros(9)
-        mujoco.mju_quat2Mat(res, data.body("link6").xquat)
+        mujoco.mju_quat2Mat(res, data.body(self.ee_link).xquat)
         Te[:3,:3] = res.reshape((3,3))
         # print(Te)
 
@@ -415,7 +416,7 @@ class LM_Chan(IK):
         # Calculate the Jacobian
         jacp = np.zeros((3, model.nv))
         jacr = np.zeros((3, model.nv))
-        mujoco.mj_jacBodyCom(model, data, jacp, jacr, model.body("link6").id)
+        mujoco.mj_jacBodyCom(model, data, jacp, jacr, model.body(self.ee_link).id)
         J = np.concatenate((jacp, jacr), axis=0)
         g = J.T @ self.We @ e
 
