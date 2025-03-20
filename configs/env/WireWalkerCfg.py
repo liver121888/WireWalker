@@ -8,7 +8,8 @@ root = str(Path(path).parent)
 ASSET_PATH = os.path.join(root, "../../assets")
 # print("ASSET_PATH: ", ASSET_PATH)
 # Use Leap Hand
-XML_DCMM_LEAP_OBJECT_PATH = "urdf/x1_xarm6_stick.xml"
+# XML_DCMM_LEAP_OBJECT_PATH = "urdf/x1_xarm6_stick.xml"
+XML_DCMM_LEAP_OBJECT_PATH = "urdf/x1_xarm6_stick_track.xml"
 # XML_DCMM_LEAP_UNSEEN_OBJECT_PATH = "urdf/x1_xarm6_leap_right_unseen_object.xml"
 XML_ARM_PATH = "urdf/xarm6_right.xml"
 ## Weight Saved Path
