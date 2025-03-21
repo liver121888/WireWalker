@@ -37,21 +37,22 @@ cmd_lin_x = 0.0
 cmd_ang = 0.0
 trigger_delta = False
 trigger_delta_hand = False
+speed_delta = 0.1
 
 def env_key_callback(keycode):
   print("chr(keycode): ", (keycode))
   global cmd_lin_y, cmd_lin_x, cmd_ang, paused, trigger_delta, trigger_delta_hand, delta_xyz, delta_xyz_hand
   if keycode == 265: # AKA: up
-    cmd_lin_y += 1
+    cmd_lin_y += speed_delta
     print("up %f" % cmd_lin_y)
   if keycode == 264: # AKA: down
-    cmd_lin_y -= 1
+    cmd_lin_y -= speed_delta
     print("down %f" % cmd_lin_y)
   if keycode == 263: # AKA: left
-    cmd_lin_x -= 1
+    cmd_lin_x -= speed_delta
     print("left: %f" % cmd_lin_x)
   if keycode == 262: # AKA: right
-    cmd_lin_x += 1
+    cmd_lin_x += speed_delta
     print("right %f" % cmd_lin_x) 
   if keycode == 52: # AKA: 4
     cmd_ang -= 0.2
