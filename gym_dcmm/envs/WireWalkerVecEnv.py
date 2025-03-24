@@ -182,27 +182,64 @@ class WireWalkerVecEnv(gym.Env):
         # Observations are dictionaries with the agent's and the object's state. (dim = 44)
         # hand_joint_indices = np.where(WireWalkerCfg.hand_mask == 1)[0] + 15
         self.observation_space = spaces.Dict(
+            # {
+            #     "base": spaces.Dict({
+            #         "v_lin_2d": spaces.Box(-4, 4, shape=(2,), dtype=np.float32),
+            #     }),
+            #     "arm": spaces.Dict({
+            #         "ee_pos3d": spaces.Box(-10, 10, shape=(3,), dtype=np.float32),
+            #         "ee_quat": spaces.Box(-1, 1, shape=(4,), dtype=np.float32),
+            #         "ee_v_lin_3d": spaces.Box(-1, 1, shape=(3,), dtype=np.float32),
+            #         "joint_pos": spaces.Box(low = np.array([self.WireWalker.model.jnt_range[i][0] for i in range(9, 15)]),
+            #                                 high = np.array([self.WireWalker.model.jnt_range[i][1] for i in range(9, 15)]),
+            #                                 dtype=np.float32),
+            #     }),
+            #     # "hand": spaces.Box(low = np.array([self.WireWalker.model.jnt_range[i][0] for i in hand_joint_indices]),
+            #     #                    high = np.array([self.WireWalker.model.jnt_range[i][1] for i in hand_joint_indices]),
+            #     #                    dtype=np.float32),
+            #     "object": spaces.Dict({
+            #         "pos3d": spaces.Box(-10, 10, shape=(3,), dtype=np.float32),
+            #         "v_lin_3d": spaces.Box(-4, 4, shape=(3,), dtype=np.float32),
+            #         ## TODO: to be determined
+            #         # "shape": spaces.Box(-5, 5, shape=(2,), dtype=np.float32),
+            #     }),
+            # }
+
+            
             {
+                """
+                Base:
+                Position of base (pos2d)                2,
+                Velocity of base (v lin 2d)             2,
+                
+                Arm:
+                joint positions (joint pos)             6,
+                Position of hoop (ee pos3d)             3,
+                Quat of hoop (ee quat)                  4,
+                Velocity of hoop (ee v lin 3d)          3,
+
+                Wire:
+                Position of closest wire point to hoop  3,
+                Quat of closest wire point to hoop      4,
+
+                Total Observation Space Dim             27,
+                """
                 "base": spaces.Dict({
+                    "pos2d": spaces.Box(-10, 10, shape=(2,), dtype=np.float32),
                     "v_lin_2d": spaces.Box(-4, 4, shape=(2,), dtype=np.float32),
                 }),
                 "arm": spaces.Dict({
-                    "ee_pos3d": spaces.Box(-10, 10, shape=(3,), dtype=np.float32),
-                    "ee_quat": spaces.Box(-1, 1, shape=(4,), dtype=np.float32),
-                    "ee_v_lin_3d": spaces.Box(-1, 1, shape=(3,), dtype=np.float32),
                     "joint_pos": spaces.Box(low = np.array([self.WireWalker.model.jnt_range[i][0] for i in range(9, 15)]),
                                             high = np.array([self.WireWalker.model.jnt_range[i][1] for i in range(9, 15)]),
                                             dtype=np.float32),
+                    "ee_pos3d": spaces.Box(-10, 10, shape=(3,), dtype=np.float32),
+                    "ee_quat": spaces.Box(-1, 1, shape=(4,), dtype=np.float32),
+                    "ee_v_lin_3d": spaces.Box(-1, 1, shape=(3,), dtype=np.float32),
                 }),
-                # "hand": spaces.Box(low = np.array([self.WireWalker.model.jnt_range[i][0] for i in hand_joint_indices]),
-                #                    high = np.array([self.WireWalker.model.jnt_range[i][1] for i in hand_joint_indices]),
-                #                    dtype=np.float32),
-                "object": spaces.Dict({
+                "wire": spaces.Dict({
                     "pos3d": spaces.Box(-10, 10, shape=(3,), dtype=np.float32),
-                    "v_lin_3d": spaces.Box(-4, 4, shape=(3,), dtype=np.float32),
-                    ## TODO: to be determined
-                    # "shape": spaces.Box(-5, 5, shape=(2,), dtype=np.float32),
-                }),
+                    "quat": spaces.Box(-1, 1, shape=(4,), dtype=np.float32),
+                })
             }
         )
         # Define the limit for the mobile base action
@@ -227,11 +264,17 @@ class WireWalkerVecEnv(gym.Env):
         # Actions (dim = 20)
         self.action_space = spaces.Dict(
             {
+                """
+                Base:
+                base low/high                           2,
+                
+                Arm:
+                arm joints?                             4,
+
+                Total Action Space Dim                  6,
+                """
                 "base": spaces.Box(base_low, base_high, shape=(2,), dtype=np.float32),
                 "arm": spaces.Box(arm_low, arm_high, shape=(4,), dtype=np.float32),
-                # "hand": spaces.Box(low = hand_low,
-                #                    high = hand_high,
-                #                    dtype = np.float32),
             }
         )
         self.action_buffer = {
@@ -261,7 +304,7 @@ class WireWalkerVecEnv(gym.Env):
         # self.obs_c_dim = self.obs_dim - 6  # dim = 18, 6 for the arm joint positions
         # self.act_c_dim = self.act_dim # dim = 6,
         print("##### Tracking Task \n obs_dim: {}, act_dim: {}".format(self.obs_t_dim, self.act_t_dim))
-        # print("##### Catching Task \n obs_dim: {}, act_dim: {}\n".format(self.obs_c_dim, self.act_c_dim))
+        print("##### Catching Task \n obs_dim: {}, act_dim: {}\n".format(self.obs_c_dim, self.act_c_dim))
 
         # Init env params
         self.arm_limit = True
