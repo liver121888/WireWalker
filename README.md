@@ -51,7 +51,7 @@ pip install -r requirements.txt
 Under `gym_dcmm/envs/`, run:
 
 ```bash
-python3 DcmmVecEnv.py --viewer
+python3 WireWalker.py --viewer
 ```
 
 Keyboard control:
