@@ -92,12 +92,13 @@
         <mesh file="hand_link_ee/hand_link_ee_collision_26.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_27.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_28.obj"/>
+        <mesh file="hand_link_ee/hand_link_ee_collision_29.obj"/>
+        <mesh file="hand_link_ee/hand_link_ee_collision_30.obj"/>
 
         <!-- Track Related -->
         <mesh name="straight" file="straight.STL" />
         <mesh name="sine" file="sine.STL"/>
         <mesh name="cosine" file="cosine.STL"/>
-
 
     </asset>
     <worldbody>
@@ -233,8 +234,11 @@
                                     <!-- <geom pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.8 0.0 0.0 1" mesh="ee_link" />
                                     <geom pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" type="mesh" rgba="0.8 0.0 0.0 1" mesh="ee_link" /> -->
 
-                                    <!-- <body name="hand_link_ee"> -->
-                                    <geom pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.8 0.0 0.0 1" mesh="hand_link_ee"/>
+                                    <!-- hand_link_ee -->
+                                    <!-- origin is in the half -->
+                                    <!-- thickness = 0.01, p1_link thickness = 0.003 -->
+                                    <!-- result z: 0.005 + 0.003 = 0.008-->
+                                    <geom pos="0.0 0.0 0.008" quat="-0.7071 0.7071 0 0" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.8 0.0 0.0 1" mesh="hand_link_ee"/>
                                     
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_0"  rgba="0.8 0.0 0.0 1.0" />
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_1"  rgba="0.8 0.0 0.0 1.0" />
@@ -265,10 +269,16 @@
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_26" rgba="0.8 0.0 0.0 1.0" />
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_27" rgba="0.8 0.0 0.0 1.0" />
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_28" rgba="0.8 0.0 0.0 1.0" />
-                                    <!-- </body> -->
+                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_29" rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_30" rgba="0.8 0.0 0.0 1.0" />
+                                    
+                                    <!-- end hand_link_ee -->
 
-                                    <body name="link_ee" pos="0.005 0.195 0.006" euler="0 1.57079 0">
-                                        <!-- <geom type="cylinder" size="0.01 0.03"/> -->
+                                    <!-- define a new body/link as ee frame -->
+                                    <!-- thickness of hand_link_ee = 0.01, hoop stick out 0.21, thickness of p1_link = 0.003-->
+                                    <!-- 0.003 + 0.01/2 = 0.008 -->
+                                    <body name="link_ee" pos="0.0 0.21 0.008" euler="0 1.57079 0">
+                                        <geom type="cylinder" size="0.005 0.03" contype="0" conaffinity="0" group="1" />
                                     </body>
                                 </body>
                             </body>
