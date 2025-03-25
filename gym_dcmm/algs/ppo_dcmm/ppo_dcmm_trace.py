@@ -15,7 +15,7 @@ from .utils import AverageScalarMeter, RunningMeanStd
 
 from tensorboardX import SummaryWriter
 
-class PPO_Track(object):
+class PPO_Trace(object):
     def __init__(self, env, output_dif, full_config):
         self.rank = -1
         self.device = full_config['rl_device']
