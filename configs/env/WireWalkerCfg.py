@@ -114,6 +114,7 @@ object_static = np.array([1.5, 2.0])
 k_obs_base = 0.01
 k_obs_arm = 0.001
 k_obs_object = 0.01
+k_obs_wire = 0.01
 # k_obs_hand = 0.01
 ## Actions Noise
 k_act = 0.025

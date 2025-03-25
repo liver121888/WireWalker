@@ -351,6 +351,7 @@ class WireWalkerVecEnv(gym.Env):
         # Random Obs & Act Params
         self.k_obs_base = WireWalkerCfg.k_obs_base
         self.k_obs_arm = WireWalkerCfg.k_obs_arm
+        self.k_obs_wire = WireWalkerCfg.k_obs_wire
         # self.k_obs_hand = WireWalkerCfg.k_obs_hand
         self.k_obs_object = WireWalkerCfg.k_obs_object
         self.k_act = WireWalkerCfg.k_act
@@ -456,6 +457,12 @@ class WireWalkerVecEnv(gym.Env):
     def _get_absolute_ee_quat(self):
         # Caclulate the absolute ee_quat
         return np.array([self.WireWalker.data.body(self.ee_link_name).xquat])
+    
+    def _get_absolute_wire_pos3d(self):
+        return np.array(self.waypoint_pos[self.last_waypoint_idx])
+    
+    def _get_absolute_wire_quat(self):
+        return np.array(self.waypoint_quat[self.last_waypoint_idx])
 
     def _get_relative_ee_v_lin_3d(self):
         # Caclulate the ee_v_lin3d w.r.t. the base_link
@@ -468,9 +475,6 @@ class WireWalkerVecEnv(gym.Env):
         # TODO: In the real world, we can only estimate it by differentiating the position
         return np.array([ee_v_lin_x, ee_v_lin_y, global_ee_v_lin[2]-base_vel[2]])
     
-    def get_closest_wire_waypoint(self):
-        ee_pos = self._get_absolute_ee_pos3d()
-        # Search in self.
     def _get_obs(self): 
         ee_pos3d = self._get_relative_ee_pos3d()
         if self.init_pos:
@@ -487,12 +491,10 @@ class WireWalkerVecEnv(gym.Env):
                 'ee_v_lin_3d': (ee_pos3d - self.prev_ee_pos3d)*self.fps + np.random.normal(0, self.k_obs_arm, 3),
                 "joint_pos": np.array(self.WireWalker.data.qpos[15:21]) + np.random.normal(0, self.k_obs_arm, 6),
             },
-            # "hand": self._get_hand_obs() + np.random.normal(0, self.k_obs_hand, 12),
-            # "object": {
-            #     "pos3d": obj_pos3d + np.random.normal(0, self.k_obs_object, 3),
-            #     # "v_lin_3d": self._get_relative_object_v_lin_3d() + np.random.normal(0, self.k_obs_object, 3),
-            #     # "v_lin_3d": (obj_pos3d - self.prev_obj_pos3d)*self.fps + np.random.normal(0, self.k_obs_object, 3),
-            # },
+            "wire": {
+                "pos3d": self._get_absolute_wire_pos3d() + np.random.normal(0, self.k_obs_wire, 3),
+                "quat": self._get_absolute_wire_quat() + np.random.normal(0, self.k_obs_wire, 4),
+            }
         }
         self.prev_ee_pos3d = ee_pos3d
         if self.print_obs:
@@ -879,7 +881,7 @@ class WireWalkerVecEnv(gym.Env):
     def advance_waypoint(self):
         ee_abs_pose = self._get_absolute_ee_pos3d().squeeze()
         
-        while self.last_waypoint_idx < len(self.waypoint_pos) and \
+        while self.last_waypoint_idx < len(self.waypoint_pos)-1 and \
                         np.linalg.norm(ee_abs_pose - self.waypoint_pos[self.last_waypoint_idx]) < WireWalkerCfg.WAYPOINT_DIST_EPSILON:
             print("Moved past waypoint", self.last_waypoint_idx)
             self.last_waypoint_idx += 1
