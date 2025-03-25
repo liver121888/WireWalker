@@ -10,6 +10,10 @@ ASSET_PATH = os.path.join(root, "../../assets")
 # Use Leap Hand
 # XML_DCMM_LEAP_OBJECT_PATH = "urdf/x1_xarm6_stick.xml"
 XML_DCMM_LEAP_OBJECT_PATH = "urdf/x1_xarm6_stick_track.xml"
+
+STRAIGHT_WIRE_JSON_PATH = "points/straight.json"
+JSON_WIRE_CONFIGS = [STRAIGHT_WIRE_JSON_PATH]
+WAYPOINT_DIST_EPSILON = 1e-2 # L2 distance to waypoint to say we 'reached' a waypoint
 # XML_DCMM_LEAP_UNSEEN_OBJECT_PATH = "urdf/x1_xarm6_leap_right_unseen_object.xml"
 XML_ARM_PATH = "urdf/xarm6_right.xml"
 ## Weight Saved Path
