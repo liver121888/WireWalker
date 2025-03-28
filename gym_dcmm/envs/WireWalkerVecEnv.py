@@ -44,34 +44,37 @@ speed_delta = 0.1
 
 
 def env_key_callback(keycode):
-  print("chr(keycode): ", (keycode))
-  global cmd_lin_y, cmd_lin_x, cmd_ang, paused, trigger_delta, trigger_delta_hand, delta_xyz, delta_xyz_hand
-  if keycode == 265: # AKA: up
-    cmd_lin_y += speed_delta
-    print("up %f" % cmd_lin_y)
-  if keycode == 264: # AKA: down
-    cmd_lin_y -= speed_delta
-    print("down %f" % cmd_lin_y)
-  if keycode == 263: # AKA: left
-    cmd_lin_x -= speed_delta
-    print("left: %f" % cmd_lin_x)
-  if keycode == 262: # AKA: right
-    cmd_lin_x += speed_delta
-    print("right %f" % cmd_lin_x) 
-  if keycode == 52: # AKA: 4
-    cmd_ang -= 0.2
-    print("turn left %f" % cmd_ang)
-  if keycode == 54: # AKA: 6
-    cmd_ang += 0.2
-    print("turn right %f" % cmd_ang)
-  if chr(keycode) == ' ': # AKA: space
-    if paused: paused = not paused
-  if keycode == 334: # AKA + (on the numpad)
-    trigger_delta = True
-    delta_xyz = 0.1
-  if keycode == 333: # AKA - (on the numpad)
-    trigger_delta = True
-    delta_xyz = -0.1
+    print("chr(keycode): ", (keycode))
+    global cmd_lin_y, cmd_lin_x, cmd_ang, paused, trigger_delta, trigger_delta_hand, delta_xyz, delta_xyz_hand
+    if keycode == 265:  # AKA: up
+        cmd_lin_y += speed_delta
+        print("up %f" % cmd_lin_y)
+    if keycode == 264:  # AKA: down
+        cmd_lin_y -= speed_delta
+        print("down %f" % cmd_lin_y)
+    if keycode == 263:  # AKA: left
+        cmd_lin_x -= speed_delta
+        print("left: %f" % cmd_lin_x)
+    if keycode == 262:  # AKA: right
+        cmd_lin_x += speed_delta
+        print("right %f" % cmd_lin_x)
+    if keycode == 52:  # AKA: 4
+        cmd_ang -= 0.2
+        print("turn left %f" % cmd_ang)
+    if keycode == 54:  # AKA: 6
+        cmd_ang += 0.2
+        print("turn right %f" % cmd_ang)
+    if chr(keycode) == " ":  # AKA: space
+        if paused:
+            paused = not paused
+    if keycode == 334:  # AKA + (on the numpad)
+        trigger_delta = True
+        delta_xyz = 0.1
+    if keycode == 333:  # AKA - (on the numpad)
+        trigger_delta = True
+        delta_xyz = -0.1
+
+
 #   if keycode == 327: # AKA 7 (on the numpad)
 #     trigger_delta_hand = True
 #     delta_xyz_hand = 0.2
@@ -406,9 +409,6 @@ class WireWalkerVecEnv(gym.Env):
         )
 
         # Check for collisions with the pipe
-        # object_contacts = np.where((geom1_groups == self.pipe_group) | (geom2_groups == self.pipe_group))[0]
-
-        # ## get the contact points of the object
         geom1_object = np.where(geom1_groups == self.pipe_group)[0]
         geom2_object = np.where(geom2_groups == self.pipe_group)[0]
         contacts_geom1 = np.array([])
@@ -419,8 +419,17 @@ class WireWalkerVecEnv(gym.Env):
             contacts_geom2 = geom2_ids[geom2_object]
         object_contacts = np.concatenate((contacts_geom1, contacts_geom2))
 
-        # print("geom1 ids: ", geom1_ids)
-        # print("geom2 ids: ", geom2_ids)
+        # geom1_names = [
+        #     mujoco.mj_id2name(self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, geom1_id)
+        #     for geom1_id in geom1_ids
+        # ]
+        # geom2_names = [
+        #     mujoco.mj_id2name(self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, geom2_id)
+        #     for geom2_id in geom2_ids
+        # ]
+
+        # print("geom1 names: ", geom1_names)
+        # print("geom2 names: ", geom2_names)
 
         if len(object_contacts) > 0:
             print("object_contacts: ", object_contacts)
