@@ -109,7 +109,7 @@ We utilize 64 CPUs and a single Nvidia RTX 3070 Ti GPU for model training. Regar
 ## Testing
 We provide our tracking model and catching model trained in a two-stage manner, which are `assets/models/track.pth` and `assets/models/catch_two_stage.pth`. You can test them for the tracking and catching task. Also, You can choose to evaluate on the training objects or the unseen objects by setting `object_eval`.
 
-### Testing on the Tracking Task
+### Testing on the Tracking Task 
 Under the root `catch_it`:
 ```bash
 python3 train_DCMM.py test=True task=Tracking num_envs=1 checkpoint_tracking=$(path_to_tracking_model) object_eval=True viewer=$(open_mujoco_viewer_or_not) imshow_cam=$(imshow_camera_or_not)
