@@ -10,20 +10,20 @@
         <texture file="assets/textures/light-wood.png" name="woodplane" type="2d"/>
         <material name="groundplane" texture="woodplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
         <!-- object-bottle -->
-        <mesh file="./bottle.stl" name="bottle_mesh" scale="0.8 0.8 0.8"/>
-        <texture type="skybox" file="assets/textures/glass.png" name="tex-glass"/>
-        <material name="glass" reflectance="0.5" texrepeat="5 5" texture="tex-glass" texuniform="true"/>
-        <mesh file="./bread.stl" name="bread_mesh" scale="1 1 1"/>
-        <mesh file="./cup.stl" name="cup_mesh" scale="0.7 0.7 0.7"/>
-        <mesh file="./bowl.stl" name="bowl_mesh" scale="0.7 0.7 0.7"/>
-        <mesh file="./winnercup.stl" name="winnercup_mesh" scale="3e-4 3e-4 3e-4"/>
+        <!-- <mesh file="./bottle.stl" name="bottle_mesh" scale="0.8 0.8 0.8"/> -->
+        <!-- <texture type="skybox" file="assets/textures/glass.png" name="tex-glass"/> -->
+        <!-- <material name="glass" reflectance="0.5" texrepeat="5 5" texture="tex-glass" texuniform="true"/> -->
+        <!-- <mesh file="./bread.stl" name="bread_mesh" scale="1 1 1"/> -->
+        <!-- <mesh file="./cup.stl" name="cup_mesh" scale="0.7 0.7 0.7"/> -->
+        <!-- <mesh file="./bowl.stl" name="bowl_mesh" scale="0.7 0.7 0.7"/> -->
+        <!-- <mesh file="./winnercup.stl" name="winnercup_mesh" scale="3e-4 3e-4 3e-4"/> -->
         <!-- object-can -->
-        <mesh file="./can.stl" name="can_mesh"/>
-        <texture file="assets/textures/soda.png" name="tex-can" type="2d"/>
-        <material name="coke" reflectance="0.7" texrepeat="5 5" texture="tex-can" texuniform="true"/>
+        <!-- <mesh file="./can.stl" name="can_mesh"/> -->
+        <!-- <texture file="assets/textures/soda.png" name="tex-can" type="2d"/> -->
+        <!-- <material name="coke" reflectance="0.7" texrepeat="5 5" texture="tex-can" texuniform="true"/> -->
         <!-- object red can-->
-        <texture file="assets/textures/red-wood.png" name="tex-red-can" type="2d"/>
-        <material name="red-coke" reflectance="0.7" texrepeat="5 5" texture="tex-red-can" texuniform="true"/>
+        <!-- <texture file="assets/textures/red-wood.png" name="tex-red-can" type="2d"/> -->
+        <!-- <material name="red-coke" reflectance="0.7" texrepeat="5 5" texture="tex-red-can" texuniform="true"/> -->
         <!-- mobile manipulator -->
         <!-- Ranger Mini V2 -->
         <mesh name="base_link" file="base_link.STL" />
@@ -291,14 +291,14 @@
         <!-- include track -->
         <include file="assets/urdf/tracks/track_straight.xml" />
 
-        <body name="object" pos="0.4 1.25 1.2">
-            <inertial pos="0.0 0 0" quat="1 0.0 -0.0 -0.0" mass="0.25" diaginertia="7.33516e-05 7.33516e-05 7.33516e-05" />
-            <joint name='object' type='free' damping="0.1" />
+        <!-- <body name="object" pos="0.4 1.25 1.2"> -->
+            <!-- <inertial pos="0.0 0 0" quat="1 0.0 -0.0 -0.0" mass="0.25" diaginertia="7.33516e-05 7.33516e-05 7.33516e-05" /> -->
+            <!-- <joint name='object' type='free' damping="0.1" /> -->
             <!-- Training Objects -->
-            <geom name='object' type="box" size="0.02 0.025 0.02" solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" rgba="1.0 0.0 0.0 1" group="0" condim="4"/>
+            <!-- <geom name='object' type="box" size="0.02 0.025 0.02" solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" rgba="1.0 0.0 0.0 1" group="0" condim="4"/> -->
             <!-- Evaluation Objects -->
             <!-- <geom name='object' mesh="bread_mesh" type="mesh" solimp="0.998 0.998 0.001" solref="0.001 1" density="50" friction="0.95 0.3 0.1" group="0" condim="4"/> -->
-        </body>
+        <!-- </body> -->
     </worldbody>
     <contact>
         <pair name = "floor_wheel_1" geom1 = "floor" geom2 = "Wheel1" friction = "1.1 1.1 0.005 0.0001 0.0001"/>
@@ -328,6 +328,6 @@
         <motor name="arm_actuator_5" joint="joint5" ctrlrange="-100 100" />
         <motor name="arm_actuator_6" joint="joint6" ctrlrange="-100 100" />
         <!-- object actuator -->
-        <motor name="object_actuator" joint="object" gear="0 0 1 0 0 0" ctrlrange = "-50 50" />
+        <!-- <motor name="object_actuator" joint="object" gear="0 0 1 0 0 0" ctrlrange = "-50 50" /> -->
     </actuator>
 </mujoco>
