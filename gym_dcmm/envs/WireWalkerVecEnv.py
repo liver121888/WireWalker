@@ -179,6 +179,18 @@ class WireWalkerVecEnv(gym.Env):
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "ranger_base"
         )
 
+        # Get the body id of the pipe
+        self.pipe_id = mujoco.mj_name2id(
+            self.WireWalker.model, mujoco.mjtObj.mjOBJ_BODY, "track_0"
+        )
+        first_geom_id = next(
+            geom_id
+            for geom_id in range(self.WireWalker.model.ngeom)
+            if self.WireWalker.model.geom_bodyid[geom_id] == self.pipe_id
+        )
+        # Retrieve the group id for pipe (assuming all geoms have same group)
+        self.pipe_group = self.WireWalker.model.geom_group[first_geom_id]
+ 
         # Set the camera configuration
         self.WireWalker.model.vis.global_.offwidth = WireWalkerCfg.cam_config["width"]
         self.WireWalker.model.vis.global_.offheight = WireWalkerCfg.cam_config["height"]
@@ -433,8 +445,20 @@ class WireWalkerVecEnv(gym.Env):
         )
 
         ## get the contact points of the object
-        geom1_object = np.where(geom1_ids == self.object_id)[0]
-        geom2_object = np.where(geom2_ids == self.object_id)[0]
+        geom1_groups = np.array(
+            [self.WireWalker.model.geom_group[geom1_id] for geom1_id in geom1_ids]
+        )
+        geom2_groups = np.array(
+            [self.WireWalker.model.geom_group[geom2_id] for geom2_id in geom2_ids]
+        )
+
+        # Check for collisions with the pipe
+        # object_contacts = np.where((geom1_groups == self.pipe_group) | (geom2_groups == self.pipe_group))[0]
+
+        # ## get the contact points of the object
+        geom1_object = np.where(geom1_groups == self.pipe_group)[0]
+        geom2_object = np.where(geom2_groups == self.pipe_group)[0]
+
         contacts_geom1 = np.array([])
         contacts_geom2 = np.array([])
         if geom1_object.size != 0:
@@ -442,6 +466,21 @@ class WireWalkerVecEnv(gym.Env):
         if geom2_object.size != 0:
             contacts_geom2 = geom2_ids[geom2_object]
         object_contacts = np.concatenate((contacts_geom1, contacts_geom2))
+
+        # geom1_names = [
+        #     mujoco.mj_id2name(self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, geom1_id)
+        #     for geom1_id in geom1_ids
+        # ]
+        # geom2_names = [
+        #     mujoco.mj_id2name(self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, geom2_id)
+        #     for geom2_id in geom2_ids
+        # ]
+
+        # print("geom1 names: ", geom1_names)
+        # print("geom2 names: ", geom2_names)
+
+        if len(object_contacts) > 0:
+             print("object_contacts: ", object_contacts)
 
         ## get the contact points of the base
         geom1_base = np.where(geom1_ids == self.base_id)[0]
