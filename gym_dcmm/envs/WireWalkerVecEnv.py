@@ -97,7 +97,7 @@ class WireWalkerVecEnv(gym.Env):
             Use the evaluation object.
         camera_name: str
             The name of the camera.
-        object_name: str
+        track_name: str
             The name of the object.
         env_time: float
             The maximum time of the environment.
@@ -114,9 +114,9 @@ class WireWalkerVecEnv(gym.Env):
         render_per_step=False,
         viewer=False,
         imshow_cam=False,
-        object_eval=False,
+        track_eval=False,
         camera_name=["top", "wrist"],
-        object_name="object",
+        track_name="straight",
         env_time=2.5,
         steps_per_policy=20,
         img_size=(480, 640),
@@ -132,7 +132,7 @@ class WireWalkerVecEnv(gym.Env):
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
         self.camera_name = camera_name
-        self.object_name = object_name
+        self.track_name = track_name
         self.imshow_cam = imshow_cam
         self.task = task
         self.img_size = img_size
@@ -147,21 +147,21 @@ class WireWalkerVecEnv(gym.Env):
         self.print_contacts = print_contacts
         # Initialize the environment
         self.WireWalker = MJ_WireWalker(
-            viewer=viewer, object_name=object_name, object_eval=object_eval
+            viewer=viewer, track_name=track_name, track_eval=track_eval
         )
         # self.WireWalker.show_model_info()
         self.fps = 1 / (self.steps_per_policy * self.WireWalker.model.opt.timestep)
         # Randomize the Object Info
         self.random_mass = 0.25
-        self.object_static_time = 0.75
-        self.object_throw = False
-        self.object_train = True
-        if object_eval:
-            self.set_object_eval()
+        # self.object_static_time = 0.75
+        # self.object_throw = False
+        self.track_train = True
+        if track_eval:
+            self.set_track_eval()
 
         self.ee_link_name = "link_ee"
 
-        self.WireWalker.model_xml_string = self._reset_object()
+        self.WireWalker.model_xml_string = self._reset_scene()
         self.WireWalker.model = mujoco.MjModel.from_xml_string(
             self.WireWalker.model_xml_string
         )
@@ -172,8 +172,8 @@ class WireWalkerVecEnv(gym.Env):
         self.floor_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "floor"
         )
-        self.object_id = mujoco.mj_name2id(
-            self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, self.object_name
+        self.track_id = mujoco.mj_name2id(
+            self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, self.track_name
         )
         self.base_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "ranger_base"
@@ -234,7 +234,7 @@ class WireWalkerVecEnv(gym.Env):
                 Base:
                 Position of base (pos2d)                2,
                 Velocity of base (v lin 2d)             2,
-                
+
                 Arm:
                 joint positions (joint pos)             6,
                 Position of hoop (ee pos3d)             3,
@@ -287,9 +287,12 @@ class WireWalkerVecEnv(gym.Env):
                 """
                 Base:
                 base low/high                           2,
-                
+
                 Arm:
-                arm joints?                             4,
+                not arm joints, is ee delta position    4,
+                and delta roll. We want to modify it to 
+                be the delta position and delta 
+                quat or roll/pitch/yaw
 
                 Total Action Space Dim                  6,
                 """
@@ -350,14 +353,15 @@ class WireWalkerVecEnv(gym.Env):
         self.vel_init = False
         self.vel_history = deque(maxlen=4)
 
+        # TODO: modify to the info we need, ideally the closest point to the hoop, then we cannot simply get track_name
         self.info = {
             "ee_distance": np.linalg.norm(
                 self.WireWalker.data.body(self.ee_link_name).xpos
-                - self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:3]
+                - self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:3]
             ),
             "base_distance": np.linalg.norm(
                 self.WireWalker.data.body(self.ee_link_name).xpos[0:2]
-                - self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:2]
+                - self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:2]
             ),
             "env_time": self.WireWalker.data.time - self.start_time,
             "imgs": {},
@@ -406,8 +410,8 @@ class WireWalkerVecEnv(gym.Env):
         print("Got", len(self.waypoint_pos), "waypoints")
         # print(self.waypoint_pos)
 
-    def set_object_eval(self):
-        self.object_train = False
+    def set_track_eval(self):
+        self.track_train = False
 
     def update_render_state(self, render_per_step):
         self.render_per_step = render_per_step
@@ -532,45 +536,46 @@ class WireWalkerVecEnv(gym.Env):
         # TODO: In the real world, we can only estimate it by differentiating the position
         return np.array([ee_v_lin_x, ee_v_lin_y, global_ee_v_lin[2] - base_vel[2]])
 
-    def _get_relative_object_pos3d(self):
-        # Caclulate the object_pos3d w.r.t. the base_link
-        base_yaw = quat2theta(
-            self.WireWalker.data.body("base_link").xquat[0],
-            self.WireWalker.data.body("base_link").xquat[3],
-        )
-        x, y = relative_position(
-            self.WireWalker.data.body("arm_base").xpos[0:2],
-            self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:2],
-            base_yaw,
-        )
-        return np.array(
-            [
-                x,
-                y,
-                self.WireWalker.data.body(self.WireWalker.object_name).xpos[2]
-                - self.WireWalker.data.body("arm_base").xpos[2],
-            ]
-        )
+    # TODO: modify these to track the relative position and speed if needed
+    # def _get_relative_object_pos3d(self):
+    #     # Caclulate the object_pos3d w.r.t. the base_link
+    #     base_yaw = quat2theta(
+    #         self.WireWalker.data.body("base_link").xquat[0],
+    #         self.WireWalker.data.body("base_link").xquat[3],
+    #     )
+    #     x, y = relative_position(
+    #         self.WireWalker.data.body("arm_base").xpos[0:2],
+    #         self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:2],
+    #         base_yaw,
+    #     )
+    #     return np.array(
+    #         [
+    #             x,
+    #             y,
+    #             self.WireWalker.data.body(self.WireWalker.object_name).xpos[2]
+    #             - self.WireWalker.data.body("arm_base").xpos[2],
+    #         ]
+    #     )
 
-    def _get_relative_object_v_lin_3d(self):
-        # Caclulate the object_v_lin3d w.r.t. the base_link
-        base_vel = self.WireWalker.data.body("arm_base").cvel[3:6]
-        global_object_v_lin = self.WireWalker.data.joint(
-            self.WireWalker.object_name
-        ).qvel[0:3]
-        base_yaw = quat2theta(
-            self.WireWalker.data.body("base_link").xquat[0],
-            self.WireWalker.data.body("base_link").xquat[3],
-        )
-        object_v_lin_x = math.cos(base_yaw) * (
-            global_object_v_lin[0] - base_vel[0]
-        ) + math.sin(base_yaw) * (global_object_v_lin[1] - base_vel[1])
-        object_v_lin_y = -math.sin(base_yaw) * (
-            global_object_v_lin[0] - base_vel[0]
-        ) + math.cos(base_yaw) * (global_object_v_lin[1] - base_vel[1])
-        return np.array(
-            [object_v_lin_x, object_v_lin_y, global_object_v_lin[2] - base_vel[2]]
-        )
+    # def _get_relative_object_v_lin_3d(self):
+    #     # Caclulate the object_v_lin3d w.r.t. the base_link
+    #     base_vel = self.WireWalker.data.body("arm_base").cvel[3:6]
+    #     global_object_v_lin = self.WireWalker.data.joint(
+    #         self.WireWalker.object_name
+    #     ).qvel[0:3]
+    #     base_yaw = quat2theta(
+    #         self.WireWalker.data.body("base_link").xquat[0],
+    #         self.WireWalker.data.body("base_link").xquat[3],
+    #     )
+    #     object_v_lin_x = math.cos(base_yaw) * (
+    #         global_object_v_lin[0] - base_vel[0]
+    #     ) + math.sin(base_yaw) * (global_object_v_lin[1] - base_vel[1])
+    #     object_v_lin_y = -math.sin(base_yaw) * (
+    #         global_object_v_lin[0] - base_vel[0]
+    #     ) + math.cos(base_yaw) * (global_object_v_lin[1] - base_vel[1])
+    #     return np.array(
+    #         [object_v_lin_x, object_v_lin_y, global_object_v_lin[2] - base_vel[2]]
+    #     )
 
     def _get_obs(self):
         ee_pos3d = self._get_relative_ee_pos3d()
@@ -606,13 +611,14 @@ class WireWalkerVecEnv(gym.Env):
     def _get_info(self):
         # Time of the Mujoco environment
         env_time = self.WireWalker.data.time - self.start_time
+        # TODO: modify this to track 
         ee_distance = np.linalg.norm(
             self.WireWalker.data.body(self.ee_link_name).xpos
-            - self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:3]
+            - self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:3]
         )
         base_distance = np.linalg.norm(
             self.WireWalker.data.body("arm_base").xpos[0:2]
-            - self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:2]
+            - self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:2]
         )
         # print("base_distance: ", base_distance)
 
@@ -666,55 +672,55 @@ class WireWalkerVecEnv(gym.Env):
             )
         return ctrl
 
-    def _reset_object(self): #TODO WHAT
+    def _reset_scene(self): #TODO WHAT
         #TODO do we ignore this and never call it (during training)
         # Parse the XML string
         root = ET.fromstring(self.WireWalker.model_xml_string)
 
         # Find the <body> element with name="object"
-        object_body = root.find(".//body[@name='object']")
-        if object_body is not None:
-            inertial = object_body.find("inertial")
-            if inertial is not None:
-                # Generate a random mass within the specified range
-                self.random_mass = np.random.uniform(
-                    WireWalkerCfg.object_mass[0], WireWalkerCfg.object_mass[0]
-                )
-                # Update the mass attribute
-                inertial.set("mass", str(self.random_mass))
-            joint = object_body.find("joint")
-            if joint is not None:
-                # Generate a random damping within the specified range
-                random_damping = np.random.uniform(
-                    WireWalkerCfg.object_damping[0], WireWalkerCfg.object_damping[1]
-                )
-                # Update the damping attribute
-                joint.set("damping", str(random_damping))
-            # Find the <geom> element
-            geom = object_body.find(".//geom[@name='object']")
-            if geom is not None:
-                # Modify the type and size attributes
-                object_id = np.random.choice([0, 1, 2, 3, 4])
-                if self.object_train:
-                    object_shape = WireWalkerCfg.object_shape[object_id]
-                    geom.set(
-                        "type", object_shape
-                    )  # Replace "box" with the desired type
-                    object_size = np.array(
-                        [
-                            np.random.uniform(low=low, high=high)
-                            for low, high in WireWalkerCfg.object_size[object_shape]
-                        ]
-                    )
-                    geom.set(
-                        "size", np.array_str(object_size)[1:-1]
-                    )  # Replace with the desired size
-                    # print("### Object Geom Info ###")
-                    # for key, value in geom.attrib.items():
-                    #     print(f"{key}: {value}")
-                else:
-                    object_mesh = WireWalkerCfg.object_mesh[object_id]
-                    geom.set("mesh", object_mesh)
+        # object_body = root.find(".//body[@name='object']")
+        # if object_body is not None:
+        #     inertial = object_body.find("inertial")
+        #     if inertial is not None:
+        #         # Generate a random mass within the specified range
+        #         self.random_mass = np.random.uniform(
+        #             WireWalkerCfg.object_mass[0], WireWalkerCfg.object_mass[0]
+        #         )
+        #         # Update the mass attribute
+        #         inertial.set("mass", str(self.random_mass))
+        #     joint = object_body.find("joint")
+        #     if joint is not None:
+        #         # Generate a random damping within the specified range
+        #         random_damping = np.random.uniform(
+        #             WireWalkerCfg.object_damping[0], WireWalkerCfg.object_damping[1]
+        #         )
+        #         # Update the damping attribute
+        #         joint.set("damping", str(random_damping))
+        #     # Find the <geom> element
+        #     geom = object_body.find(".//geom[@name='object']")
+        #     if geom is not None:
+        #         # Modify the type and size attributes
+        #         object_id = np.random.choice([0, 1, 2, 3, 4])
+        #         if self.object_train:
+        #             object_shape = WireWalkerCfg.object_shape[object_id]
+        #             geom.set(
+        #                 "type", object_shape
+        #             )  # Replace "box" with the desired type
+        #             object_size = np.array(
+        #                 [
+        #                     np.random.uniform(low=low, high=high)
+        #                     for low, high in WireWalkerCfg.object_size[object_shape]
+        #                 ]
+        #             )
+        #             geom.set(
+        #                 "size", np.array_str(object_size)[1:-1]
+        #             )  # Replace with the desired size
+        #             # print("### Object Geom Info ###")
+        #             # for key, value in geom.attrib.items():
+        #             #     print(f"{key}: {value}")
+        #         else:
+        #             object_mesh = WireWalkerCfg.object_mesh[object_id]
+        #             geom.set("mesh", object_mesh)
         # Convert the XML element tree to a string
         xml_str = ET.tostring(root, encoding="unicode")
 
@@ -769,7 +775,7 @@ class WireWalkerVecEnv(gym.Env):
         self.WireWalker.data.qpos[15:21] = WireWalkerCfg.arm_joints[:]
         # self.WireWalker.data.qpos[21:37] = WireWalkerCfg.hand_joints[:]
         self.WireWalker.data_arm.qpos[0:6] = WireWalkerCfg.arm_joints[:]
-        self.WireWalker.data.body("object").xpos[0:3] = np.array([2, 2, 1])
+        self.WireWalker.data.body(self.track_name).xpos[0:3] = np.array([2, 2, 1])
         # Random 3D position TODO: Adjust to the fov
         # self.random_object_pose()
         # self.WireWalker.set_throw_pos_vel(pose=np.concatenate((self.object_pos3d[:], self.object_q[:])),
@@ -812,13 +818,15 @@ class WireWalkerVecEnv(gym.Env):
         self.reward_touch = 0
         self.reward_stability = 0
 
-        self.info = { #TODO typo below
+        # TODO: modify to the info we need, ideally the closest point to the hoop, then we cannot simply get track_name
+        self.info = {
             "ee_distance": np.linalg.norm(self.WireWalker.data.body(self.ee_link_name).xpos - 
-                                       self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:3]),
+                                       self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:3]),
             "base_distance": np.linalg.norm(self.WireWalker.data.body(self.ee_link_name).xpos[0:2] -
-                                             self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:2]),
+                                            self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:2]),
             "evn_time": self.WireWalker.data.time - self.start_time,
         }
+
         # Get the observation and info
         self.prev_ee_pos3d[:] = self.initial_ee_pos3d[:]
         observation = self._get_obs()
@@ -1040,28 +1048,28 @@ class WireWalkerVecEnv(gym.Env):
         self.step_touch = False
         for _ in range(self.steps_per_policy):
             # Update the control command according to the latest policy output
-            self.WireWalker.data.ctrl[:-1] = self._get_ctrl()
+            self.WireWalker.data.ctrl[:] = self._get_ctrl()
             if self.render_per_step:
                 # Rendering
                 img = self.render()
             # As of MuJoCo 2.0, force-related quantities like cacc are not computed
             # unless there's a force sensor in the model.
             # See https://github.com/openai/gym/issues/1541
-            if self.WireWalker.data.time - self.start_time < self.object_static_time:
-                self.WireWalker.set_throw_pos_vel(
-                    pose=np.concatenate((self.object_pos3d[:], self.object_q[:])),
-                    velocity=np.zeros(6),
-                )
-                self.WireWalker.data.ctrl[-1] = (
-                    self.random_mass * -self.WireWalker.model.opt.gravity[2]
-                )
-            elif not self.object_throw:
-                self.WireWalker.set_throw_pos_vel(
-                    pose=np.concatenate((self.object_pos3d[:], self.object_q[:])),
-                    velocity=self.object_vel6d[:],
-                )
-                self.WireWalker.data.ctrl[-1] = 0.0
-                self.object_throw = True
+            # if self.WireWalker.data.time - self.start_time < self.object_static_time:
+            #     self.WireWalker.set_throw_pos_vel(
+            #         pose=np.concatenate((self.object_pos3d[:], self.object_q[:])),
+            #         velocity=np.zeros(6),
+            #     )
+            #     self.WireWalker.data.ctrl[-1] = (
+            #         self.random_mass * -self.WireWalker.model.opt.gravity[2]
+            #     )
+            # elif not self.object_throw:
+            #     self.WireWalker.set_throw_pos_vel(
+            #         pose=np.concatenate((self.object_pos3d[:], self.object_q[:])),
+            #         velocity=self.object_vel6d[:],
+            #     )
+            #     self.WireWalker.data.ctrl[-1] = 0.0
+            #     self.object_throw = True
 
             mujoco.mj_step(self.WireWalker.model, self.WireWalker.data)
             mujoco.mj_rnePostConstraint(self.WireWalker.model, self.WireWalker.data)
@@ -1316,7 +1324,8 @@ if __name__ == "__main__":
     print("args: ", args)
     env = WireWalkerVecEnv(
         task=args.task,
-        object_name="object",
+        # TODO: modify to a list of body
+        track_name="track_0",
         render_per_step=False,
         print_reward=args.print_reward,
         print_info=args.print_info,
@@ -1327,7 +1336,7 @@ if __name__ == "__main__":
         render_mode="rgb_array",
         imshow_cam=args.imshow_cam,
         viewer=args.viewer,
-        object_eval=False,
+        track_eval=False,
         env_time=2.5,
         steps_per_policy=20,
     )
