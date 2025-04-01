@@ -19,6 +19,7 @@ object_eval: False
 # used to set checkpoint path
 checkpoint_tracking: ''
 checkpoint_catching: ''
+checkpoint_tracing: ''
 # checkpoint_tracking: 'assets/models/track.pth'
 # checkpoint_catching: 'assets/models/catch_two_stage.pth'
 

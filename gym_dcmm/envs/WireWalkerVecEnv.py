@@ -127,7 +127,7 @@ class WireWalkerVecEnv(gym.Env):
         print_info=False,
         print_contacts=False,
     ):
-        if task not in ["Tracking", "Catching"]:
+        if task not in ["Tracking", "Catching", "Tracing"]:
             raise ValueError("Invalid task: {}".format(task))
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
