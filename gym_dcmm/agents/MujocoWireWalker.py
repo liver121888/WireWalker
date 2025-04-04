@@ -47,7 +47,7 @@ class MJ_WireWalker(object):
     - model: the MuJoCo model of the Dcmm
     - model_arm: the MuJoCo model of the arm
     - viewer: whether to show the viewer of the simulation
-    - track_name: the name of the track in the MuJoCo model
+    - wire_name: the name of the wire in the MuJoCo model
     - timestep: the simulation timestep
     - open_viewer: whether to open the viewer initially
 
@@ -56,17 +56,17 @@ class MJ_WireWalker(object):
                  model=None, 
                  model_arm=None, 
                  viewer=True, 
-                 track_name='straight',
-                 track_eval=False, 
+                 wire_name='straight',
+                 wire_eval=False, 
                  timestep=0.002):
         self.viewer = None
         self.open_viewer = viewer
         # Load the MuJoCo model
         if model is None:
-            if not track_eval: 
-                model_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_WIREWALKER_TRACK_PATH)
+            if not wire_eval: 
+                model_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_WIREWALKER_WIRE_PATH)
             else: 
-                model_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_WIREWALKER_UNSEEN_TRACK_PATH)
+                model_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_WIREWALKER_UNSEEN_WIRE_PATH)
             self.model_xml_string = xml_to_string(model_path)
         else:
             self.model = model
@@ -84,7 +84,7 @@ class MJ_WireWalker(object):
         # self.data.qpos[21:37] = WireWalkerCfg.hand_joints[:]
         self.data_arm.qpos[0:6] = WireWalkerCfg.arm_joints[:]
 
-        self.track_name = track_name
+        self.wire_name = wire_name
 
         mujoco.mj_forward(self.model, self.data)
         mujoco.mj_forward(self.model_arm, self.data_arm)

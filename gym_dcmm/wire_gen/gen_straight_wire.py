@@ -7,7 +7,7 @@ from wire_gen_utils import round_precision, save_points, save_xml
 dict_key = 'straight'
 
 
-def sample_straight(start_point, sample_num, track_num, precision=1e-3):
+def sample_straight(start_point, sample_num, wire_num, precision=1e-3):
 
     global dict_key
 
@@ -37,7 +37,7 @@ def sample_straight(start_point, sample_num, track_num, precision=1e-3):
     start_points = {dict_key: []}
 
     sampled_points = {dict_key: []}
-    for _ in range(track_num):
+    for _ in range(wire_num):
 
         start_points[dict_key].append(start_point)
         for i in range(1, sample_num + 1):
@@ -59,20 +59,20 @@ def sample_straight(start_point, sample_num, track_num, precision=1e-3):
 
     return start_points, sampled_points
 
-def xml_straight(start_point, track_num):
+def xml_straight(start_point, wire_num):
 
     global dict_key
 
-    xml_string = """<mujoco model="track_straight">"""
+    xml_string = """<mujoco model="wire_straight">"""
 
-    staight_track_string = """
-    <body name="track_{}" pos="{}" quat="{}">
+    staight_wire_string = """
+    <body name="wire_{}" pos="{}" quat="{}">
         <geom type="mesh" contype="0" conaffinity="0" group="3" rgba="0.0 0.8 0.0 1" mesh="straight" />
         <geom type="mesh" rgba="0.0 0.8 0.0 1" mesh="straight" />
     </body>"""
 
-    for i in range(track_num):
-        xml_string += staight_track_string.format(i,
+    for i in range(wire_num):
+        xml_string += staight_wire_string.format(i,
             " ".join(map(str,(start_point[dict_key][i]['x'], 
                      start_point[dict_key][i]['y'], 
                      start_point[dict_key][i]['z']))),
@@ -89,14 +89,14 @@ if __name__ == "__main__":
     parser.add_argument("--sample_num", type=float, default=10, help="Number of samples along the Z-axis")
     parser.add_argument("--precision", type=float, default=1e-3, help="Precision for coordinate rounding")
     parser.add_argument("--points_filename", type=str, default="straight.json", help="Output json filename")
-    parser.add_argument("--xml_filename", type=str, default="track_straight.xml", help="Output xml filename")
+    parser.add_argument("--xml_filename", type=str, default="wire_straight.xml", help="Output xml filename")
     parser.add_argument('--start_point', type=float, nargs=7, 
                         default=[-0.02, 0.48, 0.45, 1, 0, 0, 0], 
-                        help="Starting point of the track: x y z qw qx qy qz")
-    parser.add_argument('--track_num', type=int, default=1, help="Number of tracks to generate")
+                        help="Starting point of the wire: x y z qw qx qy qz")
+    parser.add_argument('--wire_num', type=int, default=1, help="Number of wires to generate")
     args = parser.parse_args()
 
-    start_points, points = sample_straight(args.start_point, args.sample_num, args.track_num, args.precision)
-    xml_string = xml_straight(start_points, args.track_num)
+    start_points, points = sample_straight(args.start_point, args.sample_num, args.wire_num, args.precision)
+    xml_string = xml_straight(start_points, args.wire_num)
     save_points(args.points_filename, points)
     save_xml(args.xml_filename, xml_string)

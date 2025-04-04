@@ -97,7 +97,7 @@ class WireWalkerVecEnv(gym.Env):
             Use the evaluation object.
         camera_name: str
             The name of the camera.
-        track_name: str
+        wire_name: str
             The name of the object.
         env_time: float
             The maximum time of the environment.
@@ -109,14 +109,14 @@ class WireWalkerVecEnv(gym.Env):
 
     def __init__(
         self,
-        task="tracking",
+        task="tracing",
         render_mode="depth_array",
         render_per_step=False,
         viewer=False,
         imshow_cam=False,
-        track_eval=False,
+        wire_eval=False,
         camera_name=["top", "wrist"],
-        track_name="straight",
+        wire_name="straight",
         env_time=2.5,
         steps_per_policy=20,
         img_size=(480, 640),
@@ -132,7 +132,7 @@ class WireWalkerVecEnv(gym.Env):
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
         self.camera_name = camera_name
-        self.track_name = track_name
+        self.wire_name = wire_name
         self.imshow_cam = imshow_cam
         self.task = task
         self.img_size = img_size
@@ -147,7 +147,7 @@ class WireWalkerVecEnv(gym.Env):
         self.print_contacts = print_contacts
         # Initialize the environment
         self.WireWalker = MJ_WireWalker(
-            viewer=viewer, track_name=track_name, track_eval=track_eval
+            viewer=viewer, wire_name=wire_name, wire_eval=wire_eval
         )
         # self.WireWalker.show_model_info()
         self.fps = 1 / (self.steps_per_policy * self.WireWalker.model.opt.timestep)
@@ -155,9 +155,9 @@ class WireWalkerVecEnv(gym.Env):
         self.random_mass = 0.25
         # self.object_static_time = 0.75
         # self.object_throw = False
-        self.track_train = True
-        if track_eval:
-            self.set_track_eval()
+        self.wire_train = True
+        if wire_eval:
+            self.set_wire_eval()
 
         self.ee_link_name = "link_ee"
 
@@ -172,16 +172,16 @@ class WireWalkerVecEnv(gym.Env):
         self.floor_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "floor"
         )
-        self.track_id = mujoco.mj_name2id(
-            self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, self.track_name
-        )
+        # self.wire_id = mujoco.mj_name2id(
+        #     self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, self.wire_name
+        # )
         self.base_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "ranger_base"
         )
 
         # Get the body id of the pipe
         self.pipe_id = mujoco.mj_name2id(
-            self.WireWalker.model, mujoco.mjtObj.mjOBJ_BODY, "track_0"
+            self.WireWalker.model, mujoco.mjtObj.mjOBJ_BODY, "wire_0"
         )
         first_geom_id = next(
             geom_id
@@ -216,6 +216,23 @@ class WireWalkerVecEnv(gym.Env):
 
         # Observations are dictionaries with the agent's and the object's state. (dim = 44)
         # hand_joint_indices = np.where(WireWalkerCfg.hand_mask == 1)[0] + 15
+        """
+        Base:
+        Position of base (pos2d)                2,
+        Velocity of base (v lin 2d)             2,
+
+        Arm:
+        joint positions (joint pos)             6,
+        Position of hoop (ee pos3d)             3,
+        Quat of hoop (ee quat)                  4,
+        Velocity of hoop (ee v lin 3d)          3,
+
+        Wire:
+        Position of closest wire point to hoop  3,
+        Quat of closest wire point to hoop      4,
+
+        Total Observation Space Dim             27,
+        """
         self.observation_space = spaces.Dict(
             # {
             #     "base": spaces.Dict({
@@ -239,26 +256,8 @@ class WireWalkerVecEnv(gym.Env):
             #         # "shape": spaces.Box(-5, 5, shape=(2,), dtype=np.float32),
             #     }),
             # }
-
-            
             {
-                """
-                Base:
-                Position of base (pos2d)                2,
-                Velocity of base (v lin 2d)             2,
 
-                Arm:
-                joint positions (joint pos)             6,
-                Position of hoop (ee pos3d)             3,
-                Quat of hoop (ee quat)                  4,
-                Velocity of hoop (ee v lin 3d)          3,
-
-                Wire:
-                Position of closest wire point to hoop  3,
-                Quat of closest wire point to hoop      4,
-
-                Total Observation Space Dim             27,
-                """
                 "base": spaces.Dict({
                     "pos2d": spaces.Box(-10, 10, shape=(2,), dtype=np.float32),
                     "v_lin_2d": spaces.Box(-4, 4, shape=(2,), dtype=np.float32),
@@ -294,20 +293,20 @@ class WireWalkerVecEnv(gym.Env):
         self.prev_ee_pos3d[:] = self.initial_ee_pos3d[:]
 
         # Actions (dim = 20)
+        """
+        Base:
+        base low/high                           2,
+
+        Arm:
+        not arm joints, is ee delta position    4,
+        and delta roll. We want to modify it to 
+        be the delta position and delta 
+        quat or roll/pitch/yaw
+
+        Total Action Space Dim                  6,
+        """
         self.action_space = spaces.Dict(
             {
-                """
-                Base:
-                base low/high                           2,
-
-                Arm:
-                not arm joints, is ee delta position    4,
-                and delta roll. We want to modify it to 
-                be the delta position and delta 
-                quat or roll/pitch/yaw
-
-                Total Action Space Dim                  6,
-                """
                 "base": spaces.Box(base_low, base_high, shape=(2,), dtype=np.float32),
                 "arm": spaces.Box(arm_low, arm_high, shape=(4,), dtype=np.float32),
             }
@@ -318,8 +317,8 @@ class WireWalkerVecEnv(gym.Env):
             # "hand": DynamicDelayBuffer(maxlen=2),
         }
         # Combine the limits of the action space
-        # self.actions_low = np.concatenate([base_low, arm_low, hand_low])
-        # self.actions_high = np.concatenate([base_high, arm_high, hand_high])
+        self.actions_low = np.concatenate([base_low, arm_low])
+        self.actions_high = np.concatenate([base_high, arm_high])
 
         self.obs_dim = get_total_dimension(self.observation_space)
         self.act_dim = get_total_dimension(self.action_space)
@@ -365,15 +364,34 @@ class WireWalkerVecEnv(gym.Env):
         self.vel_init = False
         self.vel_history = deque(maxlen=4)
 
-        # TODO: modify to the info we need, ideally the closest point to the hoop, then we cannot simply get track_name
+        # Wire points
+        self.wire_segment_list = WireWalkerCfg.JSON_WIRE_CONFIGS
+        # Read the JSON file
+        with open(os.path.join(WireWalkerCfg.ASSET_PATH, self.wire_segment_list[0]), 'r') as file:
+            data = json.load(file)
+
+        self.waypoint_pos = []
+        self.waypoint_quat = []
+
+        _waypoints = data['straight']
+        for pt in _waypoints:
+            self.waypoint_pos.append([pt["x"], pt["y"], pt["z"]])
+            self.waypoint_quat.append([pt['qw'], pt['qx'], pt['qy'], pt['qz']])
+        
+        self.last_waypoint_idx = 0
+        print("Got", len(self.waypoint_pos), "waypoints")
+        # print(self.waypoint_pos)
+
+
+        # get the distance between the end effector and the waypoint in wire
         self.info = {
             "ee_distance": np.linalg.norm(
-                self.WireWalker.data.body(self.ee_link_name).xpos
-                - self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:3]
+                # self.WireWalker.data.body(self.ee_link_name).xpos
+                # - self.WireWalker.data.body(self.WireWalker.wire_name).xpos[0:3]
+                self.WireWalker.data.body(self.ee_link_name).xpos - self._get_absolute_wire_pos3d()
             ),
             "base_distance": np.linalg.norm(
-                self.WireWalker.data.body(self.ee_link_name).xpos[0:2]
-                - self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:2]
+                self.WireWalker.data.body(self.ee_link_name).xpos[0:2] - self._get_absolute_wire_pos3d()[0:2]
             ),
             "env_time": self.WireWalker.data.time - self.start_time,
             "imgs": {},
@@ -404,26 +422,8 @@ class WireWalkerVecEnv(gym.Env):
         self.k_obs_object = WireWalkerCfg.k_obs_object
         self.k_act = WireWalkerCfg.k_act
 
-        # Wire points
-        self.wire_segment_list = WireWalkerCfg.JSON_WIRE_CONFIGS
-        # Read the JSON file
-        with open(os.path.join(WireWalkerCfg.ASSET_PATH, self.wire_segment_list[0]), 'r') as file:
-            data = json.load(file)
-
-        self.waypoint_pos = []
-        self.waypoint_quat = []
-
-        _waypoints = data['straight']
-        for pt in _waypoints:
-            self.waypoint_pos.append([pt["x"], pt["y"], pt["z"]])
-            self.waypoint_quat.append([pt['qw'], pt['qx'], pt['qy'], pt['qz']])
-        
-        self.last_waypoint_idx = 0
-        print("Got", len(self.waypoint_pos), "waypoints")
-        # print(self.waypoint_pos)
-
-    def set_track_eval(self):
-        self.track_train = False
+    def set_wire_eval(self):
+        self.wire_train = False
 
     def update_render_state(self, render_per_step):
         self.render_per_step = render_per_step
@@ -479,8 +479,8 @@ class WireWalkerVecEnv(gym.Env):
         # print("geom1 names: ", geom1_names)
         # print("geom2 names: ", geom2_names)
 
-        if len(object_contacts) > 0:
-             print("object_contacts: ", object_contacts)
+        if len(object_contacts) > 0 and self.print_contacts:
+            print("object_contacts: ", object_contacts)
 
         ## get the contact points of the base
         geom1_base = np.where(geom1_ids == self.base_id)[0]
@@ -575,7 +575,7 @@ class WireWalkerVecEnv(gym.Env):
         # TODO: In the real world, we can only estimate it by differentiating the position
         return np.array([ee_v_lin_x, ee_v_lin_y, global_ee_v_lin[2] - base_vel[2]])
 
-    # TODO: modify these to track the relative position and speed if needed
+    # TODO: modify these to return the relative position and speed if needed
     # def _get_relative_object_pos3d(self):
     #     # Caclulate the object_pos3d w.r.t. the base_link
     #     base_yaw = quat2theta(
@@ -652,12 +652,14 @@ class WireWalkerVecEnv(gym.Env):
         env_time = self.WireWalker.data.time - self.start_time
         # TODO: modify this to track 
         ee_distance = np.linalg.norm(
-            self.WireWalker.data.body(self.ee_link_name).xpos
-            - self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:3]
+            # self.WireWalker.data.body(self.ee_link_name).xpos
+            # - self.WireWalker.data.body(self.WireWalker.wire_name).xpos[0:3]
+            self.WireWalker.data.body(self.ee_link_name).xpos - self._get_absolute_wire_pos3d()
         )
         base_distance = np.linalg.norm(
-            self.WireWalker.data.body("arm_base").xpos[0:2]
-            - self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:2]
+            # self.WireWalker.data.body("arm_base").xpos[0:2]
+            # - self.WireWalker.data.body(self.WireWalker.wire_name).xpos[0:2]
+            self.WireWalker.data.body("arm_base").xpos[0:2] - self._get_absolute_wire_pos3d()
         )
         # print("base_distance: ", base_distance)
 
@@ -814,7 +816,8 @@ class WireWalkerVecEnv(gym.Env):
         self.WireWalker.data.qpos[15:21] = WireWalkerCfg.arm_joints[:]
         # self.WireWalker.data.qpos[21:37] = WireWalkerCfg.hand_joints[:]
         self.WireWalker.data_arm.qpos[0:6] = WireWalkerCfg.arm_joints[:]
-        self.WireWalker.data.body(self.track_name).xpos[0:3] = np.array([2, 2, 1])
+        # self.WireWalker.data.body(self.wire_name).xpos[0:3] = np.array([2, 2, 1])
+
         # Random 3D position TODO: Adjust to the fov
         # self.random_object_pose()
         # self.WireWalker.set_throw_pos_vel(pose=np.concatenate((self.object_pos3d[:], self.object_q[:])),
@@ -857,13 +860,17 @@ class WireWalkerVecEnv(gym.Env):
         self.reward_touch = 0
         self.reward_stability = 0
 
-        # TODO: modify to the info we need, ideally the closest point to the hoop, then we cannot simply get track_name
+        # TODO: modify to the info we need, ideally the closest point to the hoop, then we cannot simply get wire_name
         self.info = {
-            "ee_distance": np.linalg.norm(self.WireWalker.data.body(self.ee_link_name).xpos - 
-                                       self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:3]),
-            "base_distance": np.linalg.norm(self.WireWalker.data.body(self.ee_link_name).xpos[0:2] -
-                                            self.WireWalker.data.body(self.WireWalker.track_name).xpos[0:2]),
-            "evn_time": self.WireWalker.data.time - self.start_time,
+            "ee_distance": np.linalg.norm(
+                # self.WireWalker.data.body(self.ee_link_name).xpos
+                # - self.WireWalker.data.body(self.WireWalker.wire_name).xpos[0:3]
+                self.WireWalker.data.body(self.ee_link_name).xpos - self._get_absolute_wire_pos3d()
+            ),
+            "base_distance": np.linalg.norm(
+                self.WireWalker.data.body(self.ee_link_name).xpos[0:2] - self._get_absolute_wire_pos3d()[0:2]
+            ),
+            "env_time": self.WireWalker.data.time - self.start_time,
         }
 
         # Get the observation and info
@@ -1144,7 +1151,7 @@ class WireWalkerVecEnv(gym.Env):
     def advance_waypoint(self):
         ee_abs_pose = self._get_absolute_ee_pos3d().squeeze()
         
-        while self.last_waypoint_idx < len(self.waypoint_pos)-1 and \
+        while self.last_waypoint_idx < len(self.waypoint_pos) and \
                         np.linalg.norm(ee_abs_pose - self.waypoint_pos[self.last_waypoint_idx]) < WireWalkerCfg.WAYPOINT_DIST_EPSILON:
             print("Moved past waypoint", self.last_waypoint_idx)
             self.last_waypoint_idx += 1
@@ -1155,6 +1162,9 @@ class WireWalkerVecEnv(gym.Env):
         # Get the obs and info
         obs = self._get_obs()
         info = self._get_info()
+        # TODO: change the termination condition
+        # check if we finished the task
+        
         if self.task == "Catching":
             if (
                 info["ee_distance"] < WireWalkerCfg.distance_thresh
@@ -1166,7 +1176,12 @@ class WireWalkerVecEnv(gym.Env):
                 and self.stage == "grasping"
             ):
                 self.terminated = True
+        elif self.task == "Tracing":
+            if self.last_waypoint_idx == len(self.waypoint_pos):
+                self.terminated = True
+
         self.advance_waypoint()
+
         # Design the reward function
         # reward = self.compute_reward(obs, info, action)
         reward = 0 #temporarily
@@ -1193,6 +1208,12 @@ class WireWalkerVecEnv(gym.Env):
                 truncated = True
             else:
                 truncated = False
+        elif self.task == "Tracing":
+            if info["env_time"] > self.env_time:
+                truncated = True
+            else:
+                truncated = False
+
         terminated = self.terminated
         done = terminated or truncated
         if done:
@@ -1364,7 +1385,7 @@ if __name__ == "__main__":
     env = WireWalkerVecEnv(
         task=args.task,
         # TODO: modify to a list of body
-        track_name="track_0",
+        wire_name="straight",
         render_per_step=False,
         print_reward=args.print_reward,
         print_info=args.print_info,
@@ -1375,7 +1396,7 @@ if __name__ == "__main__":
         render_mode="rgb_array",
         imshow_cam=args.imshow_cam,
         viewer=args.viewer,
-        track_eval=False,
+        wire_eval=False,
         env_time=2.5,
         steps_per_policy=20,
     )
