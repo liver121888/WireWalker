@@ -359,6 +359,7 @@ class PPO_Trace(object):
                         ), axis=1)
         elif self.env.call('task')[0] == 'Tracing':
             obs_array = np.concatenate((
+                    obs["base"]["pos2d"],
                     obs["base"]["v_lin_2d"], 
                     obs["arm"]["ee_pos3d"], obs["arm"]["ee_quat"], obs["arm"]["ee_v_lin_3d"],
                     obs["wire"]["pos3d"], obs["wire"]["quat"],
@@ -376,7 +377,7 @@ class PPO_Trace(object):
             hand_tensor = actions[:, 5:] * self.action_track_denorm[2]
         elif self.env.call('task')[0] == 'Tracing':
             base_tensor = actions[:, :2] * self.action_track_denorm[0]
-            arm_tensor = actions[:, 2:5] * self.action_track_denorm[1]
+            arm_tensor = actions[:, 2:6] * self.action_track_denorm[1]
         else:
             base_tensor = actions[:, :2] * self.action_catch_denorm[0]
             arm_tensor = actions[:, 2:5] * self.action_catch_denorm[1]
@@ -415,6 +416,7 @@ class PPO_Trace(object):
             actions[:,:] = torch.clamp(actions[:,:], -1, 1)
             actions = torch.nn.functional.pad(actions, (0, self.full_action_dim-actions.size(1)), value=0)
             actions_dict = self.action2dict(actions)
+            # print(actions_dict)
             # print("actions_dict: ", actions_dict)
             obs, r, terminates, truncates, infos = self.env.step(actions_dict)
             # Map the obs

@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath("./gym_dcmm/"))
 import argparse
 import math
 
-print(os.getcwd())
+# print(os.getcwd())
 import configs.env.WireWalkerCfg as WireWalkerCfg
 import cv2 as cv
 import numpy as np
@@ -499,6 +499,9 @@ class WireWalkerVecEnv(gym.Env):
 
         return {"object_contacts": object_contacts, "base_contacts": base_contacts}
 
+    def _get_base_pos2d(self):
+        return np.array(self.WireWalker.data.body("arm_base").xpos[0:2])
+
     def _get_base_vel(self):
         base_yaw = quat2theta(
             self.WireWalker.data.body("base_link").xquat[0],
@@ -624,6 +627,8 @@ class WireWalkerVecEnv(gym.Env):
         # Add Obs Noise (Additive self.k_obs_base/arm/hand/object)
         obs = {
             "base": {
+                "pos2d": self._get_base_pos2d()
+                + np.random.normal(0, self.k_obs_base, 2),
                 "v_lin_2d": self._get_base_vel()
                 + np.random.normal(0, self.k_obs_base, 2),
             },
@@ -659,7 +664,7 @@ class WireWalkerVecEnv(gym.Env):
         base_distance = np.linalg.norm(
             # self.WireWalker.data.body("arm_base").xpos[0:2]
             # - self.WireWalker.data.body(self.WireWalker.wire_name).xpos[0:2]
-            self.WireWalker.data.body("arm_base").xpos[0:2] - self._get_absolute_wire_pos3d()
+            self.WireWalker.data.body("arm_base").xpos[0:2] - self._get_absolute_wire_pos3d()[0:2]
         )
         # print("base_distance: ", base_distance)
 
