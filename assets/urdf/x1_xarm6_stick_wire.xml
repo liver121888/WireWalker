@@ -95,7 +95,7 @@
         <mesh file="hand_link_ee/hand_link_ee_collision_29.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_30.obj"/>
 
-        <!-- Track Related -->
+        <!-- Wire Related -->
         <mesh name="straight" file="straight.STL" />
         <mesh name="sine" file="sine.STL"/>
         <mesh name="cosine" file="cosine.STL"/>
@@ -288,8 +288,8 @@
             </body>
         </body>
 
-        <!-- include track -->
-        <include file="assets/urdf/tracks/track_straight.xml" />
+        <!-- include wire -->
+        <include file="assets/urdf/wires/wire_straight.xml" />
 
         <!-- <body name="object" pos="0.4 1.25 1.2"> -->
             <!-- <inertial pos="0.0 0 0" quat="1 0.0 -0.0 -0.0" mass="0.25" diaginertia="7.33516e-05 7.33516e-05 7.33516e-05" /> -->
