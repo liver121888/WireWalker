@@ -9,14 +9,14 @@ ASSET_PATH = os.path.join(root, "../../assets")
 # print("ASSET_PATH: ", ASSET_PATH)
 # Use Leap Hand
 # XML_DCMM_LEAP_OBJECT_PATH = "urdf/x1_xarm6_stick.xml"
-XML_WIREWALKER_TRACK_PATH = "urdf/x1_xarm6_stick_track.xml"
-XML_WIREWALKER_UNSEEN_TRACK_PATH = "urdf/x1_xarm6_stick_track.xml"
+XML_WIREWALKER_WIRE_PATH = "urdf/x1_xarm6_stick_wire.xml"
+XML_WIREWALKER_UNSEEN_WIRE_PATH = "urdf/x1_xarm6_stick_wire.xml"
 # XML_DCMM_LEAP_UNSEEN_OBJECT_PATH = "urdf/x1_xarm6_leap_right_unseen_object.xml"
 XML_ARM_PATH = "urdf/xarm6_right.xml"
 
 STRAIGHT_WIRE_JSON_PATH = "points/straight.json"
 JSON_WIRE_CONFIGS = [STRAIGHT_WIRE_JSON_PATH]
-WAYPOINT_DIST_EPSILON = 1e-2 # L2 distance to waypoint to say we 'reached' a waypoint
+WAYPOINT_DIST_EPSILON = 1e-1 # L2 distance to waypoint to say we 'reached' a waypoint
 ## Weight Saved Path
 WEIGHT_PATH = os.path.join(ASSET_PATH, "weights")
 

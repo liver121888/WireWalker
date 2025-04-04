@@ -8,6 +8,6 @@ register(
 
 register(
     id="gym_dcmm/WireWalkerVecWorld-v0",
-    entry_point="gym_dcmm.envs:WireWalkerVecWorld",
+    entry_point="gym_dcmm.envs:WireWalkerVecEnv",
     #  max_episode_steps=300,
 )

@@ -31,7 +31,7 @@ class PPO_Trace(object):
         self.actions_high = self.env.call("actions_high")[0]
         # self.obs_shape = self.env.observation_space.shape
         self.obs_shape = (self.env.call("obs_t_dim")[0],)
-        self.full_action_dim = self.env.call("act_c_dim")[0]
+        self.full_action_dim = self.env.call("act_t_dim")[0]
         # ---- Model ----
         net_config = {
             'actor_units': self.network_config.mlp.units,
@@ -357,11 +357,11 @@ class PPO_Trace(object):
                         obs["object"]["pos3d"], obs["object"]["v_lin_3d"], 
                         obs["hand"],
                         ), axis=1)
-        else:
+        elif self.env.call('task')[0] == 'Tracing':
             obs_array = np.concatenate((
                     obs["base"]["v_lin_2d"], 
                     obs["arm"]["ee_pos3d"], obs["arm"]["ee_quat"], obs["arm"]["ee_v_lin_3d"],
-                    obs["object"]["pos3d"], obs["object"]["v_lin_3d"],
+                    obs["wire"]["pos3d"], obs["wire"]["quat"],
                     # obs["hand"],# TODO: TEST
                     ), axis=1)
         obs_tensor = torch.tensor(obs_array, dtype=torch.float32).to(self.device)
@@ -374,14 +374,18 @@ class PPO_Trace(object):
             base_tensor = actions[:, :2] * self.action_track_denorm[0]
             arm_tensor = actions[:, 2:5] * self.action_track_denorm[1]
             hand_tensor = actions[:, 5:] * self.action_track_denorm[2]
+        elif self.env.call('task')[0] == 'Tracing':
+            base_tensor = actions[:, :2] * self.action_track_denorm[0]
+            arm_tensor = actions[:, 2:5] * self.action_track_denorm[1]
         else:
             base_tensor = actions[:, :2] * self.action_catch_denorm[0]
             arm_tensor = actions[:, 2:5] * self.action_catch_denorm[1]
             hand_tensor = actions[:, 5:] * self.action_catch_denorm[2]
+
         actions_dict = {
             'arm': arm_tensor,
             'base': base_tensor,
-            'hand': hand_tensor
+            # 'hand': hand_tensor
         }
         return actions_dict
 
