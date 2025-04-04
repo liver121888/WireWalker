@@ -216,6 +216,23 @@ class WireWalkerVecEnv(gym.Env):
 
         # Observations are dictionaries with the agent's and the object's state. (dim = 44)
         # hand_joint_indices = np.where(WireWalkerCfg.hand_mask == 1)[0] + 15
+        """
+        Base:
+        Position of base (pos2d)                2,
+        Velocity of base (v lin 2d)             2,
+
+        Arm:
+        joint positions (joint pos)             6,
+        Position of hoop (ee pos3d)             3,
+        Quat of hoop (ee quat)                  4,
+        Velocity of hoop (ee v lin 3d)          3,
+
+        Wire:
+        Position of closest wire point to hoop  3,
+        Quat of closest wire point to hoop      4,
+
+        Total Observation Space Dim             27,
+        """
         self.observation_space = spaces.Dict(
             # {
             #     "base": spaces.Dict({
@@ -239,26 +256,8 @@ class WireWalkerVecEnv(gym.Env):
             #         # "shape": spaces.Box(-5, 5, shape=(2,), dtype=np.float32),
             #     }),
             # }
-
-            
             {
-                """
-                Base:
-                Position of base (pos2d)                2,
-                Velocity of base (v lin 2d)             2,
 
-                Arm:
-                joint positions (joint pos)             6,
-                Position of hoop (ee pos3d)             3,
-                Quat of hoop (ee quat)                  4,
-                Velocity of hoop (ee v lin 3d)          3,
-
-                Wire:
-                Position of closest wire point to hoop  3,
-                Quat of closest wire point to hoop      4,
-
-                Total Observation Space Dim             27,
-                """
                 "base": spaces.Dict({
                     "pos2d": spaces.Box(-10, 10, shape=(2,), dtype=np.float32),
                     "v_lin_2d": spaces.Box(-4, 4, shape=(2,), dtype=np.float32),
@@ -294,20 +293,20 @@ class WireWalkerVecEnv(gym.Env):
         self.prev_ee_pos3d[:] = self.initial_ee_pos3d[:]
 
         # Actions (dim = 20)
+        """
+        Base:
+        base low/high                           2,
+
+        Arm:
+        not arm joints, is ee delta position    4,
+        and delta roll. We want to modify it to 
+        be the delta position and delta 
+        quat or roll/pitch/yaw
+
+        Total Action Space Dim                  6,
+        """
         self.action_space = spaces.Dict(
             {
-                """
-                Base:
-                base low/high                           2,
-
-                Arm:
-                not arm joints, is ee delta position    4,
-                and delta roll. We want to modify it to 
-                be the delta position and delta 
-                quat or roll/pitch/yaw
-
-                Total Action Space Dim                  6,
-                """
                 "base": spaces.Box(base_low, base_high, shape=(2,), dtype=np.float32),
                 "arm": spaces.Box(arm_low, arm_high, shape=(4,), dtype=np.float32),
             }
