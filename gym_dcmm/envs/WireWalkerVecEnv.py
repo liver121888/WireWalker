@@ -299,9 +299,7 @@ class WireWalkerVecEnv(gym.Env):
 
         Arm:
         not arm joints, is ee delta position    4,
-        and delta roll. We want to modify it to 
-        be the delta position and delta 
-        quat or roll/pitch/yaw
+        and delta roll. x, y, z, roll
 
         Total Action Space Dim                  6,
         """
@@ -1084,7 +1082,7 @@ class WireWalkerVecEnv(gym.Env):
     def _step_mujoco_simulation(self, action_dict):
         ## TODO: Low-Pass-Filter the Base Velocity
         self.WireWalker.target_base_vel[0:2] = action_dict["base"]
-        action_arm = np.concatenate((action_dict["arm"], np.zeros(3)))
+        action_arm = np.concatenate((action_dict["arm"], np.zeros(2)))
         result_QP, _ = self.WireWalker.move_ee_pose(action_arm)
         if result_QP[1]:
             self.arm_limit = True
@@ -1156,9 +1154,9 @@ class WireWalkerVecEnv(gym.Env):
     def advance_waypoint(self):
         ee_abs_pose = self._get_absolute_ee_pos3d().squeeze()
         
-        while self.last_waypoint_idx < len(self.waypoint_pos) and \
+        while self.last_waypoint_idx < len(self.waypoint_pos) -1 and \
                         np.linalg.norm(ee_abs_pose - self.waypoint_pos[self.last_waypoint_idx]) < WireWalkerCfg.WAYPOINT_DIST_EPSILON:
-            print("Moved past waypoint", self.last_waypoint_idx)
+            # print("Moved past waypoint", self.last_waypoint_idx)
             self.last_waypoint_idx += 1
 
     def step(self, action):
