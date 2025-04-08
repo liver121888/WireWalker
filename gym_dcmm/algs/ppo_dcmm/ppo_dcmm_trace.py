@@ -24,14 +24,15 @@ class PPO_Trace(object):
         # ---- build environment ----
         self.env = env
         self.num_actors = int(self.ppo_config['num_actors'])
+        print("===== Initializing PPO_Trace =====")
         print("num_actors: ", self.num_actors)
-        self.actions_num = self.env.call("act_t_dim")[0]
+        self.actions_num = self.env.call("act_dim")[0]
         print("actions_num: ", self.actions_num)
         self.actions_low = self.env.call("actions_low")[0]
         self.actions_high = self.env.call("actions_high")[0]
         # self.obs_shape = self.env.observation_space.shape
-        self.obs_shape = (self.env.call("obs_t_dim")[0],)
-        self.full_action_dim = self.env.call("act_t_dim")[0]
+        self.obs_shape = (self.env.call("obs_dim")[0],)
+        self.full_action_dim = self.env.call("act_dim")[0]
         # ---- Model ----
         net_config = {
             'actor_units': self.network_config.mlp.units,
@@ -361,11 +362,13 @@ class PPO_Trace(object):
             obs_array = np.concatenate((
                     obs["base"]["pos2d"],
                     obs["base"]["v_lin_2d"], 
+                    obs["arm"]["joint_pos"],
                     obs["arm"]["ee_pos3d"], obs["arm"]["ee_quat"], obs["arm"]["ee_v_lin_3d"],
                     obs["wire"]["pos3d"], obs["wire"]["quat"],
                     # obs["hand"],# TODO: TEST
                     ), axis=1)
         obs_tensor = torch.tensor(obs_array, dtype=torch.float32).to(self.device)
+        # print("obs_tensor.shape: ", obs_tensor.shape)
         return obs_tensor
 
     def action2dict(self, actions):

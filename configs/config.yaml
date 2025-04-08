@@ -9,12 +9,22 @@ rl_device: ???
 device_id: 0  # 'cuda:?', -1 for 'cpu'
 
 # Disables viewer or camera visualization
-viewer: False
+viewer: True
 imshow_cam: False
 # RL Arguments
 test: False # False, True
 task: Tracing # Catching_TwoStage, Catching_OneStage, Tracking
-num_envs: 8 # This should be no more than 2x your CPUs (1x is recommended)
+
+# make sure to set batch_size, minibatch_size according to num_envs in WireWalkerPPO.yaml
+# self.batch_size = self.horizon_length * self.num_actors
+# num_actors = num_envs
+# default: 
+# num_envs: 8
+# minibatch_size: 512
+# horizon_length: 64
+
+num_envs: 1 # This should be no more than 2x your CPUs (1x is recommended)
+# num_envs: 8 # This should be no more than 2x your CPUs (1x is recommended)
 wire_eval: False
 
 # used to set checkpoint path
@@ -25,7 +35,7 @@ checkpoint_tracing: ''
 # checkpoint_catching: 'assets/models/catch_two_stage.pth'
 
 # wandb config
-output_name: Dcmm
+output_name: WireWalker
 wandb_mode: "disabled"  # "online" | "offline" | "disabled"
 wandb_entity: 'Your_username'
 # wandb_project: 'RL_Dcmm_Track_Random'
@@ -34,7 +44,7 @@ wandb_project: 'RL_Dcmm_Catch_Random'
 # set default task and default training config based on task
 # currently we keep the same PPO settings for WireWalker
 defaults:
-  - train: DcmmPPO
+  - train: WireWalkerPPO
   - hydra/job_logging: disabled
 
 # set the directory where the output files get saved

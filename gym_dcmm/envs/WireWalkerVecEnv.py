@@ -328,20 +328,23 @@ class WireWalkerVecEnv(gym.Env):
         # act: base linear velocity 2, arm ee delta position 3, delta roll 1
 
         # 24, 6
-        print("self.obs_dim: ", self.obs_dim)
-        print("self.act_dim: ", self.act_dim)
-
-        self.obs_t_dim = (
-            self.obs_dim - 6
-        )  # dim = 18, 6 for the arm joint positions, we don't observe the arm joint positions
-        self.act_t_dim = self.act_dim  # dim = 6
-        # self.obs_c_dim = self.obs_dim - 6  # dim = 18, 6 for the arm joint positions
-        # self.act_c_dim = self.act_dim # dim = 6,
         print(
-            "##### Tracking Task \n obs_dim: {}, act_dim: {}".format(
-                self.obs_t_dim, self.act_t_dim
+            "##### {} Task: obs_dim: {}, act_dim: {}".format(
+                self.task, self.obs_dim, self.act_dim
             )
         )
+
+        # self.obs_t_dim = (
+        #     self.obs_dim - 6
+        # )  # dim = 18, 6 for the arm joint positions, we don't observe the arm joint positions
+        # self.act_t_dim = self.act_dim  # dim = 6
+        # self.obs_c_dim = self.obs_dim - 6  # dim = 18, 6 for the arm joint positions
+        # self.act_c_dim = self.act_dim # dim = 6,
+        # print(
+        #     "##### {} Task: obs_dim: {}, act_dim: {}".format(
+        #         self.task, self.obs_t_dim, self.act_t_dim
+        #     )
+        # )
         # print("##### Catching Task \n obs_dim: {}, act_dim: {}\n".format(self.obs_c_dim, self.act_c_dim))
 
         # Init env params
