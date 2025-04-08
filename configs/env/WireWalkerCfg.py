@@ -27,32 +27,19 @@ WEIGHT_PATH = os.path.join(ASSET_PATH, "weights")
 arm_joints = np.array([
    0.0, 0.0, -0.0, 3.07, 2.25, -1.5 
 ])
-
-# hand_joints = np.array([
-#     0.0, 0.0, 0.0, 0.0,
-#     0.0, 0.0, 0.0, 0.0,
-#     0.0, 0.0, 0.0, 0.0,
-#     0.0, 0.0, 0.0, 0.0,
-# ])
-
 ## Define the reward weights
 reward_weights = {
-    "r_base_pos": 0.0,
-    "r_ee_pos": 10.0,
+    "r_center_dist": 1.0,
     "r_precision": 10.0,
-    "r_orient": 1.0,
-    "r_touch": {
-        'Tracking': 5,
-        'Catching': 0.1
-    },
     "r_constraint": 1.0,
     "r_stability": 20.0,
     "r_ctrl": {
-        'base': 0.2,
-        'arm': 1.0,
-        # 'hand': 0.2,
+        'base': -0.2,
+        'arm': -1.0,
     },
-    "r_collision": -10.0,
+    "r_collision": -15.0,
+    "r_progress": 1.0,
+    "r_time": -1e-2,
 }
 
 ## Define the camera params for the MujocoRenderer.
@@ -146,19 +133,3 @@ Ki_arm = np.array([1e-2, 1e-2, 1e-2, 1e-2, 1e-2, 1e-3])
 Kd_arm = np.array([40.0, 40.0, 40.0, 5.0, 10.0, 1])
 llim_arm = np.array([-300.0, -300.0, -300.0, -50.0, -50.0, -20.0])
 ulim_arm = np.array([300.0, 300.0, 300.0, 50.0, 50.0, 20.0])
-
-# Kp_hand = np.array([4e-1, 1e-2, 2e-1, 2e-1,
-#                       4e-1, 1e-2, 2e-1, 2e-1,
-#                       4e-1, 1e-2, 2e-1, 2e-1,
-#                       1e-1, 1e-1, 1e-1, 1e-2,])
-# Ki_hand = 1e-2
-# Kd_hand = np.array([3e-2, 1e-3, 2e-3, 1e-3,
-#                       3e-2, 1e-3, 2e-3, 1e-3,
-#                       3e-2, 1e-3, 2e-3, 1e-3,
-#                       1e-2, 1e-2, 2e-2, 1e-3,])
-# llim_hand = -5.0
-# ulim_hand = 5.0
-# hand_mask = np.array([1, 0, 1, 1,
-#                       1, 0, 1, 1,
-#                       1, 0, 1, 1,
-#                       0, 1, 1, 1])

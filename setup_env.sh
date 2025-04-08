@@ -1,0 +1,13 @@
+export LIBGL_DRIVERS_PATH=/usr/lib/x86_64-linux-gnu/dri
+export MESA_LOADER_DRIVER_OVERRIDE=iris
+export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
+export PATH=/opt/openrobots/bin:$PATH
+export PKG_CONFIG_PATH=/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH
+export LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=/opt/openrobots/lib/python3.8/site-packages:$PYTHONPATH
+export CMAKE_PREFIX_PATH=/opt/openrobots:$CMAKE_PREFIX_PATH
+export LD_LIBRARY_PATH=$HOME/.mujoco/mujoco210/bin:$LD_LIBRARY_PATH
+export MUJOCO_PY_MUJOCO_PATH=$HOME/.mujoco/mujoco210
+export MUJOCO_PY_MJPRO_PATH=$HOME/.mujoco/mujoco210 
+export MUJOCO_PY_MJKEY_PATH=$HOME/.mujoco/mjkey.txt
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia

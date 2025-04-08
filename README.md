@@ -204,3 +204,7 @@ Please consider citing our paper if you find this repo useful:
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 
+# 箭头键控制机器人的线性运动speed（前进、后退、左移、右移）
+# 数字键 4 和 6 控制角度转向
+# 空格键用于暂停/继续模拟
+# 数字键盘的加号和减号触发机械臂的位置调整
