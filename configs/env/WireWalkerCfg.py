@@ -34,24 +34,40 @@ arm_joints = np.array([
 # ])
 
 ## Define the reward weights
+# reward_weights = {
+#     "r_base_pos": 0.0,
+#     "r_ee_pos": 10.0,
+#     "r_precision": 10.0,
+#     "r_orient": 1.0,
+#     "r_touch": {
+#         'Tracking': 5,
+#         'Catching': 0.1
+#     },
+#     "r_constraint": 1.0,
+#     "r_stability": 20.0,
+#     "r_ctrl": {
+#         'base': 0.2,
+#         'arm': 1.0,
+#         # 'hand': 0.2,
+#     },
+#     "r_collision": -10.0,
+# }
+
+# gwen version
 reward_weights = {
-    "r_base_pos": 0.0,
-    "r_ee_pos": 10.0,
+    "r_center_dist": 1.0,
     "r_precision": 10.0,
-    "r_orient": 1.0,
-    "r_touch": {
-        'Tracking': 5,
-        'Catching': 0.1
-    },
     "r_constraint": 1.0,
     "r_stability": 20.0,
     "r_ctrl": {
-        'base': 0.2,
-        'arm': 1.0,
-        # 'hand': 0.2,
+        'base': -0.2,
+        'arm': -1.0,
     },
-    "r_collision": -10.0,
+    "r_collision": -15.0,
+    "r_progress": 1.0,
+    "r_time": -1e-2,
 }
+
 
 ## Define the camera params for the MujocoRenderer.
 cam_config = {
