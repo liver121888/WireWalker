@@ -14,8 +14,6 @@ XML_WIREWALKER_UNSEEN_WIRE_PATH = "urdf/x1_xarm6_stick_wire.xml"
 # XML_DCMM_LEAP_UNSEEN_OBJECT_PATH = "urdf/x1_xarm6_leap_right_unseen_object.xml"
 XML_ARM_PATH = "urdf/xarm6_right.xml"
 
-STRAIGHT_WIRE_JSON_PATH = "points/straight.json"
-JSON_WIRE_CONFIGS = [STRAIGHT_WIRE_JSON_PATH]
 WAYPOINT_DIST_EPSILON = 1e-1 # L2 distance to waypoint to say we 'reached' a waypoint
 ## Weight Saved Path
 WEIGHT_PATH = os.path.join(ASSET_PATH, "weights")
@@ -92,8 +90,7 @@ k_drive = np.array([0.75, 1.25])
 k_steer = np.array([0.75, 1.25])
 ## Arm Joints
 k_arm = np.array([0.75, 1.25])
-## Hand Joints
-# k_hand = np.array([0.75, 1.25])
+
 ## Object Shape and Size
 object_shape = ["box", "cylinder", "sphere", "ellipsoid", "capsule"]
 object_mesh = ["bottle_mesh", "bread_mesh", "bowl_mesh", "cup_mesh", "winnercup_mesh"]
@@ -123,7 +120,6 @@ k_act = 0.025
 act_delay = {
     'base': [1,],
     'arm': [1,],
-    # 'hand': [1,],
 }
 
 ## Define PID params for wheel drive and steering. 
@@ -146,19 +142,3 @@ Ki_arm = np.array([1e-2, 1e-2, 1e-2, 1e-2, 1e-2, 1e-3])
 Kd_arm = np.array([40.0, 40.0, 40.0, 5.0, 10.0, 1])
 llim_arm = np.array([-300.0, -300.0, -300.0, -50.0, -50.0, -20.0])
 ulim_arm = np.array([300.0, 300.0, 300.0, 50.0, 50.0, 20.0])
-
-# Kp_hand = np.array([4e-1, 1e-2, 2e-1, 2e-1,
-#                       4e-1, 1e-2, 2e-1, 2e-1,
-#                       4e-1, 1e-2, 2e-1, 2e-1,
-#                       1e-1, 1e-1, 1e-1, 1e-2,])
-# Ki_hand = 1e-2
-# Kd_hand = np.array([3e-2, 1e-3, 2e-3, 1e-3,
-#                       3e-2, 1e-3, 2e-3, 1e-3,
-#                       3e-2, 1e-3, 2e-3, 1e-3,
-#                       1e-2, 1e-2, 2e-2, 1e-3,])
-# llim_hand = -5.0
-# ulim_hand = 5.0
-# hand_mask = np.array([1, 0, 1, 1,
-#                       1, 0, 1, 1,
-#                       1, 0, 1, 1,
-#                       0, 1, 1, 1])

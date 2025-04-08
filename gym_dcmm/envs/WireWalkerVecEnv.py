@@ -303,10 +303,8 @@ class WireWalkerVecEnv(gym.Env):
         self.vel_init = False
         self.vel_history = deque(maxlen=4)
 
-        # Wire points
-        self.wire_segment_list = WireWalkerCfg.JSON_WIRE_CONFIGS
-        # Read the JSON file
-        with open(os.path.join(WireWalkerCfg.ASSET_PATH, self.wire_segment_list[0]), 'r') as file:
+        # Read the JSON file to get wire points
+        with open(os.path.join(WireWalkerCfg.ASSET_PATH, 'points', wire_name + '.json'), 'r') as file:
             data = json.load(file)
 
         self.waypoint_pos = []
@@ -318,23 +316,14 @@ class WireWalkerVecEnv(gym.Env):
             self.waypoint_quat.append([pt['qw'], pt['qx'], pt['qy'], pt['qz']])
         
         self.last_waypoint_idx = 0
-        print("Got", len(self.waypoint_pos), "waypoints")
+        self.waypoint_num = len(self.waypoint_pos)
+        print("Got", self.waypoint_num, "waypoints")
         # print(self.waypoint_pos)
 
 
         # get the distance between the end effector and the waypoint in wire
-        self.info = {
-            "ee_distance": np.linalg.norm(
-                # self.WireWalker.data.body(self.ee_link_name).xpos
-                # - self.WireWalker.data.body(self.WireWalker.wire_name).xpos[0:3]
-                self.WireWalker.data.body(self.ee_link_name).xpos - self._get_absolute_wire_pos3d()
-            ),
-            "base_distance": np.linalg.norm(
-                self.WireWalker.data.body(self.ee_link_name).xpos[0:2] - self._get_absolute_wire_pos3d()[0:2]
-            ),
-            "env_time": self.WireWalker.data.time - self.start_time,
-            "imgs": {},
-        }
+        self.info = self._get_info()
+
         self.contacts = {
             # Get contact point from the mujoco model
             "object_contacts": np.array([]),
@@ -485,10 +474,10 @@ class WireWalkerVecEnv(gym.Env):
         return np.array([self.WireWalker.data.body(self.ee_link_name).xquat])
     
     def _get_absolute_wire_pos3d(self):
-        return np.array(self.waypoint_pos[self.last_waypoint_idx])
+        return np.array(self.waypoint_pos[min(self.last_waypoint_idx, self.waypoint_num-1)])
     
     def _get_absolute_wire_quat(self):
-        return np.array(self.waypoint_quat[self.last_waypoint_idx])
+        return np.array(self.waypoint_quat[min(self.last_waypoint_idx, self.waypoint_num-1)])
 
     def _get_relative_ee_v_lin_3d(self):
         # Caclulate the ee_v_lin3d w.r.t. the base_link
@@ -550,6 +539,7 @@ class WireWalkerVecEnv(gym.Env):
             self.WireWalker.data.body(self.ee_link_name).xpos - self._get_absolute_wire_pos3d()
         )
         base_distance = np.linalg.norm(
+            # TODO: should modify to the distance between the base and the last waypoint (?
             self.WireWalker.data.body("arm_base").xpos[0:2] - self._get_absolute_wire_pos3d()[0:2]
         )
         # print("base_distance: ", base_distance)
@@ -563,11 +553,14 @@ class WireWalkerVecEnv(gym.Env):
             print("ee_distance: ", ee_distance)
             print("ee_abs_pose: ", ee_abs_pose)
             print("ee_abs_quat: ", ee_abs_quat)
+
         return {
             # Get contact point from the mujoco model
             "env_time": env_time,
             "ee_distance": ee_distance,
             "base_distance": base_distance,
+            # Update imgs elsewhere
+            "imgs": {},
         }
 
     def update_target_ctrl(self):
@@ -753,17 +746,7 @@ class WireWalkerVecEnv(gym.Env):
         self.reward_stability = 0
 
         # TODO: modify to the info we need, ideally the closest point to the hoop, then we cannot simply get wire_name
-        self.info = {
-            "ee_distance": np.linalg.norm(
-                # self.WireWalker.data.body(self.ee_link_name).xpos
-                # - self.WireWalker.data.body(self.WireWalker.wire_name).xpos[0:3]
-                self.WireWalker.data.body(self.ee_link_name).xpos - self._get_absolute_wire_pos3d()
-            ),
-            "base_distance": np.linalg.norm(
-                self.WireWalker.data.body(self.ee_link_name).xpos[0:2] - self._get_absolute_wire_pos3d()[0:2]
-            ),
-            "env_time": self.WireWalker.data.time - self.start_time,
-        }
+        self.info = self._get_info()
 
         # Get the observation and info
         self.prev_ee_pos3d[:] = self.initial_ee_pos3d[:]
@@ -839,7 +822,48 @@ class WireWalkerVecEnv(gym.Env):
         else:
             self.reward_touch = 0
 
-        if self.task == "Catching":
+        if self.task == "Tracing":
+            # TODO: modify the reward function
+            # can copy from tracking
+            pass
+        elif self.task == "Tracking":
+            ## Ctrl Penalty
+            # Compute the norm of base and arm movement through the current actions in the grasping stage
+            reward_ctrl = -self.norm_ctrl(ctrl, {"base", "arm"})
+            ## Object Orientation Reward
+            # Compute the dot product of the velocity vector of the object and the z axis of the end_effector
+            rotation_matrix = quaternion_to_rotation_matrix(obs["arm"]["ee_quat"])
+            local_velocity_vector = np.dot(rotation_matrix.T, obs["object"]["v_lin_3d"])
+            hand_z_axis = np.array([0, 0, 1])
+            reward_orient = (
+                abs(cos_angle_between_vectors(local_velocity_vector, hand_z_axis))
+                * WireWalkerCfg.reward_weights["r_orient"]
+            )
+            ## Add up the rewards
+            rewards = (
+                reward_base_pos
+                + reward_ee_pos
+                + reward_ee_precision
+                + reward_orient
+                + reward_ctrl
+                + reward_collision
+                + reward_constraint
+                + self.reward_touch
+            )
+            if self.print_reward:
+                if reward_constraint < 0:
+                    print("ctrl: ", ctrl)
+                print("### print reward")
+                print(
+                    "reward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, reward_ctrl: {:.3f}, \n".format(
+                        reward_ee_pos, reward_ee_precision, reward_orient, reward_ctrl
+                    )
+                    + "reward_collision: {:.3f}, reward_constraint: {:.3f}, reward_touch: {:.3f}".format(
+                        reward_collision, reward_constraint, self.reward_touch
+                    )
+                )
+                print("total reward: {:.3f}\n".format(rewards))
+        elif self.task == "Catching":
             reward_orient = 0
             ## Calculate the total reward in different stages
             if self.stage == "tracking":
@@ -926,43 +950,7 @@ class WireWalkerVecEnv(gym.Env):
                         )
                     )
                     print("total reward: {:.3f}\n".format(rewards))
-        elif self.task == "Tracking":
-            ## Ctrl Penalty
-            # Compute the norm of base and arm movement through the current actions in the grasping stage
-            reward_ctrl = -self.norm_ctrl(ctrl, {"base", "arm"})
-            ## Object Orientation Reward
-            # Compute the dot product of the velocity vector of the object and the z axis of the end_effector
-            rotation_matrix = quaternion_to_rotation_matrix(obs["arm"]["ee_quat"])
-            local_velocity_vector = np.dot(rotation_matrix.T, obs["object"]["v_lin_3d"])
-            hand_z_axis = np.array([0, 0, 1])
-            reward_orient = (
-                abs(cos_angle_between_vectors(local_velocity_vector, hand_z_axis))
-                * WireWalkerCfg.reward_weights["r_orient"]
-            )
-            ## Add up the rewards
-            rewards = (
-                reward_base_pos
-                + reward_ee_pos
-                + reward_ee_precision
-                + reward_orient
-                + reward_ctrl
-                + reward_collision
-                + reward_constraint
-                + self.reward_touch
-            )
-            if self.print_reward:
-                if reward_constraint < 0:
-                    print("ctrl: ", ctrl)
-                print("### print reward")
-                print(
-                    "reward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, reward_ctrl: {:.3f}, \n".format(
-                        reward_ee_pos, reward_ee_precision, reward_orient, reward_ctrl
-                    )
-                    + "reward_collision: {:.3f}, reward_constraint: {:.3f}, reward_touch: {:.3f}".format(
-                        reward_collision, reward_constraint, self.reward_touch
-                    )
-                )
-                print("total reward: {:.3f}\n".format(rewards))
+
         else:
             raise ValueError("Invalid task: {}".format(self.task))
 
@@ -1026,9 +1014,9 @@ class WireWalkerVecEnv(gym.Env):
     def advance_waypoint(self):
         ee_abs_pose = self._get_absolute_ee_pos3d().squeeze()
         
-        while self.last_waypoint_idx < len(self.waypoint_pos) -1 and \
-                        np.linalg.norm(ee_abs_pose - self.waypoint_pos[self.last_waypoint_idx]) < WireWalkerCfg.WAYPOINT_DIST_EPSILON:
-            # print("Moved past waypoint", self.last_waypoint_idx)
+        while self.last_waypoint_idx < self.waypoint_num and \
+                np.linalg.norm(ee_abs_pose - self.waypoint_pos[self.last_waypoint_idx]) < WireWalkerCfg.WAYPOINT_DIST_EPSILON:
+            print("Moved past waypoint", self.last_waypoint_idx)
             self.last_waypoint_idx += 1
 
     def step(self, action):
@@ -1052,14 +1040,18 @@ class WireWalkerVecEnv(gym.Env):
             ):
                 self.terminated = True
         elif self.task == "Tracing":
-            if self.last_waypoint_idx == len(self.waypoint_pos):
+            if self.last_waypoint_idx == self.waypoint_num:
+                print("### Tracing Success!!!")
                 self.terminated = True
 
         self.advance_waypoint()
 
         # Design the reward function
+        # Before we update the info, we need to compute the reward
         # reward = self.compute_reward(obs, info, action)
+
         reward = 0 #temporarily
+        # Update the info
         self.info["base_distance"] = info["base_distance"]
         self.info["ee_distance"] = info["ee_distance"]
         # Rendering
@@ -1093,7 +1085,8 @@ class WireWalkerVecEnv(gym.Env):
         done = terminated or truncated
         if done:
             # TEST ONLY
-            # self.reset()
+            print("### DONE ###")
+            self.reset()
             pass
         return obs, reward, terminated, truncated, info
 
@@ -1193,6 +1186,7 @@ class WireWalkerVecEnv(gym.Env):
         if self.WireWalker.viewer != None:
             self.WireWalker.viewer.close()
 
+    # Ignore the comments in the following function
     def run_test(self):
         global cmd_lin_x, cmd_lin_y, trigger_delta, trigger_delta_hand, delta_xyz, delta_xyz_hand
         self.reset()
@@ -1200,7 +1194,6 @@ class WireWalkerVecEnv(gym.Env):
         action = np.zeros(6)
         while True:
             # Note: action's dim = 18, which includes 2 for the base, 4 for the arm, and 12 for the hand
-            # print("##### stage: ", self.stage)
             # Keyboard control
             action[0:2] = np.array([cmd_lin_x, cmd_lin_y])
             if trigger_delta:
@@ -1238,7 +1231,7 @@ if __name__ == "__main__":
         "--imshow_cam", action="store_true", help="imshow the camera image or not"
     )
     parser.add_argument(
-        "--task", type=str, default="Tracking", help="Task for the WireWalkerEnv"
+        "--task", type=str, default="Tracing", help="Task for the WireWalkerEnv"
     )
     parser.add_argument(
         "--print_reward", action="store_true", help="print the reward or not"
@@ -1272,7 +1265,8 @@ if __name__ == "__main__":
         imshow_cam=args.imshow_cam,
         viewer=args.viewer,
         wire_eval=False,
-        env_time=2.5,
+        # last 5 minutes
+        env_time=300,
         steps_per_policy=20,
     )
     env.run_test()
