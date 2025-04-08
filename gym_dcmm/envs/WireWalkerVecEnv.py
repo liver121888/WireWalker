@@ -1117,6 +1117,7 @@ class WireWalkerVecEnv(gym.Env):
         self.reset()
         # action = np.zeros(18)
         action = np.zeros(6)
+        total_reward = 0.0
         while True:
             # Note: action's dim = 18, which includes 2 for the base, 4 for the arm, and 12 for the hand
             # print("##### stage: ", self.stage)
@@ -1145,6 +1146,9 @@ class WireWalkerVecEnv(gym.Env):
             }
             # print("self.WireWalker.data.body('link6'):", self.WireWalker.data.body('link6'))
             observation, reward, terminated, truncated, info = self.step(actions_dict)
+            total_reward += reward
+            print(f"当前奖励: {reward:.4f}")
+            print(f"累计奖励: {total_reward:.4f}")
 
 
 if __name__ == "__main__":
