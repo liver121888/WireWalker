@@ -43,7 +43,6 @@ trigger_delta = False
 trigger_delta_hand = False
 speed_delta = 0.1
 
-
 def env_key_callback(keycode):
   print("chr(keycode): ", (keycode))
   global cmd_lin_y, cmd_lin_x, cmd_ang, paused, trigger_delta, trigger_delta_hand, delta_xyz, delta_xyz_hand
@@ -73,12 +72,6 @@ def env_key_callback(keycode):
   if keycode == 333: # AKA - (on the numpad)
     trigger_delta = True
     delta_xyz = -0.1
-#   if keycode == 327: # AKA 7 (on the numpad)
-#     trigger_delta_hand = True
-#     delta_xyz_hand = 0.2
-#   if keycode == 329: # AKA 9 (on the numpad)
-#     trigger_delta_hand = True
-#     delta_xyz_hand = -0.2
 
 
 class WireWalkerVecEnv(gym.Env):
@@ -166,30 +159,25 @@ class WireWalkerVecEnv(gym.Env):
             self.WireWalker.model_xml_string
         )
         self.WireWalker.data = mujoco.MjData(self.WireWalker.model)
-        # Get the geom id of the hand, the floor and the object
-        # self.hand_start_id = mujoco.mj_name2id(self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, 'mcp_joint') - 1
-        # print("self.hand_start_id: ", self.hand_start_id)
         self.floor_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "floor"
         )
-        # self.wire_id = mujoco.mj_name2id(
-        #     self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, self.wire_name
-        # )
+
         self.base_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "ranger_base"
         )
 
-        # Get the body id of the pipe
-        self.pipe_id = mujoco.mj_name2id(
+        # Get the body id of the wire
+        self.wire_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_BODY, "wire_0"
         )
         first_geom_id = next(
             geom_id
             for geom_id in range(self.WireWalker.model.ngeom)
-            if self.WireWalker.model.geom_bodyid[geom_id] == self.pipe_id
+            if self.WireWalker.model.geom_bodyid[geom_id] == self.wire_id
         )
-        # Retrieve the group id for pipe (assuming all geoms have same group)
-        self.pipe_group = self.WireWalker.model.geom_group[first_geom_id]
+        # Retrieve the group id for wire (assuming all geoms have same group)
+        self.wire_group = self.WireWalker.model.geom_group[first_geom_id]
  
         # Set the camera configuration
         self.WireWalker.model.vis.global_.offwidth = WireWalkerCfg.cam_config["width"]
@@ -214,8 +202,7 @@ class WireWalkerVecEnv(gym.Env):
         else:
             self.WireWalker.viewer = None
 
-        # Observations are dictionaries with the agent's and the object's state. (dim = 44)
-        # hand_joint_indices = np.where(WireWalkerCfg.hand_mask == 1)[0] + 15
+        # Observations
         """
         Base:
         Position of base (pos2d)                2,
@@ -234,28 +221,6 @@ class WireWalkerVecEnv(gym.Env):
         Total Observation Space Dim             27,
         """
         self.observation_space = spaces.Dict(
-            # {
-            #     "base": spaces.Dict({
-            #         "v_lin_2d": spaces.Box(-4, 4, shape=(2,), dtype=np.float32),
-            #     }),
-            #     "arm": spaces.Dict({
-            #         "ee_pos3d": spaces.Box(-10, 10, shape=(3,), dtype=np.float32),
-            #         "ee_quat": spaces.Box(-1, 1, shape=(4,), dtype=np.float32),
-            #         "ee_v_lin_3d": spaces.Box(-1, 1, shape=(3,), dtype=np.float32),
-            #         "joint_pos": spaces.Box(low = np.array([self.WireWalker.model.jnt_range[i][0] for i in range(9, 15)]),
-            #                                 high = np.array([self.WireWalker.model.jnt_range[i][1] for i in range(9, 15)]),
-            #                                 dtype=np.float32),
-            #     }),
-            #     # "hand": spaces.Box(low = np.array([self.WireWalker.model.jnt_range[i][0] for i in hand_joint_indices]),
-            #     #                    high = np.array([self.WireWalker.model.jnt_range[i][1] for i in hand_joint_indices]),
-            #     #                    dtype=np.float32),
-            #     "object": spaces.Dict({
-            #         "pos3d": spaces.Box(-10, 10, shape=(3,), dtype=np.float32),
-            #         "v_lin_3d": spaces.Box(-4, 4, shape=(3,), dtype=np.float32),
-            #         ## TODO: to be determined
-            #         # "shape": spaces.Box(-5, 5, shape=(2,), dtype=np.float32),
-            #     }),
-            # }
             {
 
                 "base": spaces.Dict({
@@ -282,9 +247,6 @@ class WireWalkerVecEnv(gym.Env):
         # Define the limit for the arm action
         arm_low = -0.025 * np.ones(4)
         arm_high = 0.025 * np.ones(4)
-        # Define the limit for the hand action
-        # hand_low = np.array([self.WireWalker.model.jnt_range[i][0] for i in hand_joint_indices])
-        # hand_high = np.array([self.WireWalker.model.jnt_range[i][1] for i in hand_joint_indices])
 
         # Get initial ee_pos3d
         self.init_pos = True
@@ -292,7 +254,7 @@ class WireWalkerVecEnv(gym.Env):
         self.prev_ee_pos3d = np.array([0.0, 0.0, 0.0])
         self.prev_ee_pos3d[:] = self.initial_ee_pos3d[:]
 
-        # Actions (dim = 20)
+        # Actions
         """
         Base:
         base low/high                           2,
@@ -312,7 +274,6 @@ class WireWalkerVecEnv(gym.Env):
         self.action_buffer = {
             "base": DynamicDelayBuffer(maxlen=2),
             "arm": DynamicDelayBuffer(maxlen=2),
-            # "hand": DynamicDelayBuffer(maxlen=2),
         }
         # Combine the limits of the action space
         self.actions_low = np.concatenate([base_low, arm_low])
@@ -321,31 +282,11 @@ class WireWalkerVecEnv(gym.Env):
         self.obs_dim = get_total_dimension(self.observation_space)
         self.act_dim = get_total_dimension(self.action_space)
 
-        # obs: base linear velocity 2, arm ee delta position 3,
-        # arm ee position diff 3, arm ee orientation 4,
-        # object position 3 object position diff 3
-
-        # act: base linear velocity 2, arm ee delta position 3, delta roll 1
-
-        # 24, 6
         print(
             "##### {} Task: obs_dim: {}, act_dim: {}".format(
                 self.task, self.obs_dim, self.act_dim
             )
         )
-
-        # self.obs_t_dim = (
-        #     self.obs_dim - 6
-        # )  # dim = 18, 6 for the arm joint positions, we don't observe the arm joint positions
-        # self.act_t_dim = self.act_dim  # dim = 6
-        # self.obs_c_dim = self.obs_dim - 6  # dim = 18, 6 for the arm joint positions
-        # self.act_c_dim = self.act_dim # dim = 6,
-        # print(
-        #     "##### {} Task: obs_dim: {}, act_dim: {}".format(
-        #         self.task, self.obs_t_dim, self.act_t_dim
-        #     )
-        # )
-        # print("##### Catching Task \n obs_dim: {}, act_dim: {}\n".format(self.obs_c_dim, self.act_c_dim))
 
         # Init env params
         self.arm_limit = True
@@ -355,10 +296,7 @@ class WireWalkerVecEnv(gym.Env):
         self.reward_touch = 0
         self.reward_stability = 0
         self.env_time = env_time
-        self.stage_list = ["tracking", "grasping"]
-        # Default stage is "tracking"
-        self.stage = self.stage_list[0]
-        self.steps = 0
+        self.steps = 0 
 
         self.prev_ctrl = np.zeros(18)
         self.init_ctrl = True
@@ -374,7 +312,7 @@ class WireWalkerVecEnv(gym.Env):
         self.waypoint_pos = []
         self.waypoint_quat = []
 
-        _waypoints = data['straight']
+        _waypoints = data[self.wire_name]
         for pt in _waypoints:
             self.waypoint_pos.append([pt["x"], pt["y"], pt["z"]])
             self.waypoint_quat.append([pt['qw'], pt['qx'], pt['qy'], pt['qz']])
@@ -426,15 +364,6 @@ class WireWalkerVecEnv(gym.Env):
     def set_wire_eval(self):
         self.wire_train = False
 
-    def update_render_state(self, render_per_step):
-        self.render_per_step = render_per_step
-
-    def update_stage(self, stage):
-        if stage in self.stage_list:
-            self.stage = stage
-        else:
-            raise ValueError("Invalid stage: {}".format(stage))
-
     def _get_contacts(self):
         # Contact information
         contacts = self.WireWalker.data.contact
@@ -453,12 +382,12 @@ class WireWalkerVecEnv(gym.Env):
             [self.WireWalker.model.geom_group[geom2_id] for geom2_id in geom2_ids]
         )
 
-        # Check for collisions with the pipe
-        # object_contacts = np.where((geom1_groups == self.pipe_group) | (geom2_groups == self.pipe_group))[0]
+        # Check for collisions with the wire
+        # object_contacts = np.where((geom1_groups == self.wire_group) | (geom2_groups == self.wire_group))[0]
 
         # ## get the contact points of the object
-        geom1_object = np.where(geom1_groups == self.pipe_group)[0]
-        geom2_object = np.where(geom2_groups == self.pipe_group)[0]
+        geom1_object = np.where(geom1_groups == self.wire_group)[0]
+        geom2_object = np.where(geom2_groups == self.wire_group)[0]
 
         contacts_geom1 = np.array([])
         contacts_geom2 = np.array([])
@@ -579,47 +508,6 @@ class WireWalkerVecEnv(gym.Env):
         # TODO: In the real world, we can only estimate it by differentiating the position
         return np.array([ee_v_lin_x, ee_v_lin_y, global_ee_v_lin[2] - base_vel[2]])
 
-    # TODO: modify these to return the relative position and speed if needed
-    # def _get_relative_object_pos3d(self):
-    #     # Caclulate the object_pos3d w.r.t. the base_link
-    #     base_yaw = quat2theta(
-    #         self.WireWalker.data.body("base_link").xquat[0],
-    #         self.WireWalker.data.body("base_link").xquat[3],
-    #     )
-    #     x, y = relative_position(
-    #         self.WireWalker.data.body("arm_base").xpos[0:2],
-    #         self.WireWalker.data.body(self.WireWalker.object_name).xpos[0:2],
-    #         base_yaw,
-    #     )
-    #     return np.array(
-    #         [
-    #             x,
-    #             y,
-    #             self.WireWalker.data.body(self.WireWalker.object_name).xpos[2]
-    #             - self.WireWalker.data.body("arm_base").xpos[2],
-    #         ]
-    #     )
-
-    # def _get_relative_object_v_lin_3d(self):
-    #     # Caclulate the object_v_lin3d w.r.t. the base_link
-    #     base_vel = self.WireWalker.data.body("arm_base").cvel[3:6]
-    #     global_object_v_lin = self.WireWalker.data.joint(
-    #         self.WireWalker.object_name
-    #     ).qvel[0:3]
-    #     base_yaw = quat2theta(
-    #         self.WireWalker.data.body("base_link").xquat[0],
-    #         self.WireWalker.data.body("base_link").xquat[3],
-    #     )
-    #     object_v_lin_x = math.cos(base_yaw) * (
-    #         global_object_v_lin[0] - base_vel[0]
-    #     ) + math.sin(base_yaw) * (global_object_v_lin[1] - base_vel[1])
-    #     object_v_lin_y = -math.sin(base_yaw) * (
-    #         global_object_v_lin[0] - base_vel[0]
-    #     ) + math.cos(base_yaw) * (global_object_v_lin[1] - base_vel[1])
-    #     return np.array(
-    #         [object_v_lin_x, object_v_lin_y, global_object_v_lin[2] - base_vel[2]]
-    #     )
-
     def _get_obs(self):
         ee_pos3d = self._get_relative_ee_pos3d()
         if self.init_pos:
@@ -654,17 +542,14 @@ class WireWalkerVecEnv(gym.Env):
         # return obs_tensor
 
     def _get_info(self):
+
         # Time of the Mujoco environment
         env_time = self.WireWalker.data.time - self.start_time
-        # TODO: modify this to track 
+
         ee_distance = np.linalg.norm(
-            # self.WireWalker.data.body(self.ee_link_name).xpos
-            # - self.WireWalker.data.body(self.WireWalker.wire_name).xpos[0:3]
             self.WireWalker.data.body(self.ee_link_name).xpos - self._get_absolute_wire_pos3d()
         )
         base_distance = np.linalg.norm(
-            # self.WireWalker.data.body("arm_base").xpos[0:2]
-            # - self.WireWalker.data.body(self.WireWalker.wire_name).xpos[0:2]
             self.WireWalker.data.body("arm_base").xpos[0:2] - self._get_absolute_wire_pos3d()[0:2]
         )
         # print("base_distance: ", base_distance)
@@ -704,9 +589,10 @@ class WireWalkerVecEnv(gym.Env):
             self.WireWalker.data.qpos[15:21],
             self.WireWalker.data.time,
         )  # 6
-        # mv_hand = self.WireWalker.hand_pid.update(self.action_buffer["hand"][0], self.WireWalker.data.qpos[21:37], self.WireWalker.data.time) # 16
+
         ctrl = np.concatenate([mv_steer, mv_drive, mv_arm], axis=0)
         # print(ctrl.shape)
+
         # Add Action Noise (Scale with self.k_act)
         # noise level: self.k_act
         ctrl *= np.random.normal(1, self.k_act, ctrl.shape[0])
@@ -775,11 +661,12 @@ class WireWalkerVecEnv(gym.Env):
 
 
     def random_PID(self):
-        # Random the PID Controller Params in DCMM
+
+        # Random the PID Controller Params in WireWalker
         self.k_arm = np.random.uniform(0, 1, size=6)
         self.k_drive = np.random.uniform(0, 1, size=4)
         self.k_steer = np.random.uniform(0, 1, size=4)
-        # self.k_hand = np.random.uniform(0, 1, size=1)
+
         # Reset the PID Controller
         self.WireWalker.arm_pid.reset(
             self.k_arm * (WireWalkerCfg.k_arm[1] - WireWalkerCfg.k_arm[0])
@@ -793,21 +680,20 @@ class WireWalkerVecEnv(gym.Env):
             self.k_drive * (WireWalkerCfg.k_drive[1] - WireWalkerCfg.k_drive[0])
             + WireWalkerCfg.k_drive[0]
         )
-        # self.WireWalker.hand_pid.reset(self.k_hand[0]*(WireWalkerCfg.k_hand[1]-WireWalkerCfg.k_hand[0])+WireWalkerCfg.k_hand[0])
 
     def random_delay(self):
-        # Random the Delay Buffer Params in DCMM
+        # Random the Delay Buffer Params in WireWalker
         self.action_buffer["base"].set_maxlen(
             np.random.choice(WireWalkerCfg.act_delay["base"])
         )
         self.action_buffer["arm"].set_maxlen(
             np.random.choice(WireWalkerCfg.act_delay["arm"])
         )
-        # self.action_buffer["hand"].set_maxlen(np.random.choice(WireWalkerCfg.act_delay['hand']))
+
         # Clear Buffer
         self.action_buffer["base"].clear()
         self.action_buffer["arm"].clear()
-        # self.action_buffer["hand"].clear()
+
 
     def _reset_simulation(self):
         # Reset the data in Mujoco Simulation
@@ -1083,6 +969,7 @@ class WireWalkerVecEnv(gym.Env):
         return rewards
 
     def _step_mujoco_simulation(self, action_dict):
+
         ## TODO: Low-Pass-Filter the Base Velocity
         self.WireWalker.target_base_vel[0:2] = action_dict["base"]
         action_arm = np.concatenate((action_dict["arm"], np.zeros(2)))
@@ -1093,7 +980,7 @@ class WireWalkerVecEnv(gym.Env):
         else:
             # print("IK Failed!!!")
             self.arm_limit = False
-        # self.WireWalker.action_hand2qpos(action_dict["hand"])
+
         # Add Target Action to the Buffer
         self.update_target_ctrl()
         # Reset the Criteria for Successfully Touch
@@ -1132,25 +1019,7 @@ class WireWalkerVecEnv(gym.Env):
             if self.contacts["base_contacts"].size != 0:
                 self.terminated = True
 
-            # check the object contacts to determine the state of the object
-            # mask_coll = self.contacts['object_contacts'] < self.hand_start_id
-            # mask_finger = self.contacts['object_contacts'] > self.hand_start_id
-            # mask_hand = self.contacts['object_contacts'] >= self.hand_start_id
-            # mask_palm = self.contacts['object_contacts'] == self.hand_start_id
-            # # Whether the object is caught
-            # if self.step_touch == False:
-            #     if self.task == "Catching" and np.any(mask_hand):
-            #         self.step_touch = True
-            #     elif self.task == "Tracking" and np.any(mask_palm):
-            #         self.step_touch = True
-            # # Whether the object falls
-            # if not self.terminated:
-            #     if self.task == "Catching":
-            #         self.terminated = np.any(mask_coll)
-            #     elif self.task == "Tracking":
-            #         self.terminated = np.any(mask_coll) or np.any(mask_finger)
-
-            # If the object falls, terminate the episode in advance
+            # terminate the episode in advance
             if self.terminated:
                 break
 
