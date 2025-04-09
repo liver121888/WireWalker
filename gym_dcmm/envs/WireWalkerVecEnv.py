@@ -598,13 +598,20 @@ class WireWalkerVecEnv(gym.Env):
             )
         return ctrl
 
-    def _reset_scene(self): #TODO WHAT
-        #TODO do we ignore this and never call it (during training)
+    def _reset_scene(self):
+        
         # Parse the XML string
         root = ET.fromstring(self.WireWalker.model_xml_string)
 
-        # Find the <body> element with name="object"
-        # object_body = root.find(".//body[@name='object']")
+        # Find the <include> element with name="wire"
+        include_body = root.find(".//include[@name='wire']")
+        if include_body is not None:
+            file_name = include_body.get("file")
+            if file_name is not None:
+                # Update the file attribute with the new file path
+                include_body.set("file", "assets/urdf/wires/wire_{}.xml".format(self.wire_name))
+
+
         # if object_body is not None:
         #     inertial = object_body.find("inertial")
         #     if inertial is not None:
@@ -647,6 +654,8 @@ class WireWalkerVecEnv(gym.Env):
         #         else:
         #             object_mesh = WireWalkerCfg.object_mesh[object_id]
         #             geom.set("mesh", object_mesh)
+
+
         # Convert the XML element tree to a string
         xml_str = ET.tostring(root, encoding="unicode")
 
@@ -1304,6 +1313,9 @@ if __name__ == "__main__":
         "--viewer", action="store_true", help="open the mujoco.viewer or not"
     )
     parser.add_argument(
+        "--wire_name", type=str, default="straight", help="wire name"
+    )
+    parser.add_argument(
         "--imshow_cam", action="store_true", help="imshow the camera image or not"
     )
     parser.add_argument(
@@ -1329,7 +1341,7 @@ if __name__ == "__main__":
     env = WireWalkerVecEnv(
         task=args.task,
         # TODO: modify to a list of body
-        wire_name="straight",
+        wire_name=args.wire_name,
         render_per_step=False,
         print_reward=args.print_reward,
         print_info=args.print_info,

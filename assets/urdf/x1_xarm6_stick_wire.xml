@@ -289,7 +289,7 @@
         </body>
 
         <!-- include wire -->
-        <include file="assets/urdf/wires/wire_straight.xml" />
+        <include name="wire" file="assets/urdf/wires/wire_straight.xml" />
 
         <!-- <body name="object" pos="0.4 1.25 1.2"> -->
             <!-- <inertial pos="0.0 0 0" quat="1 0.0 -0.0 -0.0" mass="0.25" diaginertia="7.33516e-05 7.33516e-05 7.33516e-05" /> -->
