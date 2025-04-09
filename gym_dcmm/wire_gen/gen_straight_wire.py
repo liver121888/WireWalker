@@ -1,6 +1,4 @@
 import argparse
-import os
-import json
 import numpy as np
 from wire_gen_utils import round_precision, save_points, save_xml
 
@@ -41,7 +39,7 @@ def sample_points(args):
     for _ in range(wire_num):
 
         start_points[dict_key].append(start_point)
-        for i in range(1, sample_num + 1):
+        for i in range(0, sample_num + 1):
             point_dict = {}
             x_pos = i/sample_num * wire_length  # Compute X position
             point_dict['x'] = round_precision(start_point['x'] + x_pos, precision)
@@ -92,10 +90,11 @@ def gen_xml(start_point, args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--name", type=str, default='straight', help="Name of the wire")
+    # we acturally gen sample_num + 1 points
     parser.add_argument("--sample_num", type=float, default=10, help="Number of samples along the X")
     parser.add_argument("--precision", type=float, default=1e-3, help="Precision for coordinate rounding")
     parser.add_argument('--start_point', type=float, nargs=7, 
-                        default=[-0.02, 0.48, 0.45, 1, 0, 0, 0], 
+                        default=[-0.02, 0.48, 0.45, 1.0, 0.0, 0.0, 0.0], 
                         help="Starting point of the wire: x y z qw qx qy qz")
     parser.add_argument('--wire_num', type=int, default=1, help="Number of wires to generate")
     args = parser.parse_args()
