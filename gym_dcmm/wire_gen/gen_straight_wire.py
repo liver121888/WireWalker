@@ -4,12 +4,13 @@ import json
 import numpy as np
 from wire_gen_utils import round_precision, save_points, save_xml
 
-dict_key = 'straight'
+def sample_points(args):
 
-
-def sample_straight(start_point, sample_num, wire_num, precision=1e-3):
-
-    global dict_key
+    dict_key = args.name
+    start_point = args.start_point
+    sample_num = args.sample_num
+    wire_num = args.wire_num
+    precision = args.precision
 
     # Formula: z = c
     # x is of len 0.1
@@ -18,7 +19,7 @@ def sample_straight(start_point, sample_num, wire_num, precision=1e-3):
     # print(type(start_point))
     # Start point
 
-    straight_length = 0.1
+    wire_length = 0.1
 
     # Sample points along the X-axis
     # don't include start point, include end point instead
@@ -42,7 +43,7 @@ def sample_straight(start_point, sample_num, wire_num, precision=1e-3):
         start_points[dict_key].append(start_point)
         for i in range(1, sample_num + 1):
             point_dict = {}
-            x_pos = i/sample_num * straight_length  # Compute X position
+            x_pos = i/sample_num * wire_length  # Compute X position
             point_dict['x'] = round_precision(start_point['x'] + x_pos, precision)
             point_dict['y'] = round_precision(start_point['y'], precision)
             point_dict['z'] = round_precision(start_point['z'], precision)
@@ -53,50 +54,56 @@ def sample_straight(start_point, sample_num, wire_num, precision=1e-3):
             sampled_points[dict_key].append(point_dict)
         start_point = sampled_points[dict_key][-1]
 
-    print(f"Sampled {len(sampled_points[dict_key])} points along Z-axis:")
+    print(f"Sampled {len(sampled_points[dict_key])} points along X")
     for point in sampled_points[dict_key]:
         print(point)
 
     return start_points, sampled_points
 
-def xml_straight(start_point, wire_num):
+def gen_xml(start_point, args):
 
-    global dict_key
+    wire_num = args.wire_num
+    dict_key = args.name
 
-    xml_string = """<mujoco model="wire_straight">"""
+    xml_string = """<mujoco model="wire_{}">""".format(dict_key)
 
-    staight_wire_string = """
+    straight_wire_string = """
     <body name="wire_{}" pos="{}" quat="{}">
-        <geom type="mesh" contype="0" conaffinity="0" group="3" rgba="0.0 0.8 0.0 1" mesh="straight" />
-        <geom type="mesh" rgba="0.0 0.8 0.0 1" mesh="straight" />
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="{}" />
+        <geom name="wire_{}" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="{}" />
     </body>"""
 
     for i in range(wire_num):
-        xml_string += staight_wire_string.format(i,
+        xml_string += straight_wire_string.format(i,
             " ".join(map(str,(start_point[dict_key][i]['x'], 
                      start_point[dict_key][i]['y'], 
                      start_point[dict_key][i]['z']))),
             " ".join(map(str,(start_point[dict_key][i]['qw'],
                                 start_point[dict_key][i]['qx'],
                                 start_point[dict_key][i]['qy'],
-                                start_point[dict_key][i]['qz']))))
+                                start_point[dict_key][i]['qz']))),
+            dict_key,
+            i,
+            dict_key)
 
     xml_string += """\n</mujoco>"""
     return xml_string
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--sample_num", type=float, default=10, help="Number of samples along the Z-axis")
+    parser.add_argument("--name", type=str, default='straight', help="Name of the wire")
+    parser.add_argument("--sample_num", type=float, default=10, help="Number of samples along the X")
     parser.add_argument("--precision", type=float, default=1e-3, help="Precision for coordinate rounding")
-    parser.add_argument("--points_filename", type=str, default="straight.json", help="Output json filename")
-    parser.add_argument("--xml_filename", type=str, default="wire_straight.xml", help="Output xml filename")
     parser.add_argument('--start_point', type=float, nargs=7, 
                         default=[-0.02, 0.48, 0.45, 1, 0, 0, 0], 
                         help="Starting point of the wire: x y z qw qx qy qz")
     parser.add_argument('--wire_num', type=int, default=1, help="Number of wires to generate")
     args = parser.parse_args()
 
-    start_points, points = sample_straight(args.start_point, args.sample_num, args.wire_num, args.precision)
-    xml_string = xml_straight(start_points, args.wire_num)
+    args.points_filename = args.name + ".json"
+    args.xml_filename = "wire_" + args.name + ".xml"
+
+    start_points, points = sample_points(args)
+    xml_string = gen_xml(start_points, args)
     save_points(args.points_filename, points)
     save_xml(args.xml_filename, xml_string)

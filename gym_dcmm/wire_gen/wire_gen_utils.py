@@ -10,9 +10,9 @@ def get_points_save_path(filename):
     return os.path.join(target_dir, filename)
 
 def get_xml_save_path(filename):
-    """ Get absolute path to save file in ../../assets/urdf/tracks. """
+    """ Get absolute path to save file in ../../assets/urdf/wires. """
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    target_dir = os.path.abspath(os.path.join(script_dir, "../../assets/urdf/tracks"))
+    target_dir = os.path.abspath(os.path.join(script_dir, "../../assets/urdf/wires"))
     os.makedirs(target_dir, exist_ok=True)
     return os.path.join(target_dir, filename)
 
