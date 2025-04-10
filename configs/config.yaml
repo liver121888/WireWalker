@@ -37,9 +37,9 @@ checkpoint_tracing: ''
 # wandb config
 output_name: WireWalker
 wandb_mode: "disabled"  # "online" | "offline" | "disabled"
-wandb_entity: 'Your_username'
+wandb_entity: 'wirewalker'
 # wandb_project: 'RL_Dcmm_Track_Random'
-wandb_project: 'RL_Dcmm_Catch_Random'
+wandb_project: 'sandbox_reward_tuning'
 
 # set default task and default training config based on task
 # currently we keep the same PPO settings for WireWalker
