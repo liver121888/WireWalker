@@ -12,7 +12,7 @@ device_id: 0  # 'cuda:?', -1 for 'cpu'
 viewer: True
 imshow_cam: False
 # RL Arguments
-test: False # False, True
+test: True # False, True
 task: Tracing # Catching_TwoStage, Catching_OneStage, Tracking
 
 # make sure to set batch_size, minibatch_size according to num_envs in WireWalkerPPO.yaml
@@ -30,7 +30,7 @@ wire_eval: False
 # used to set checkpoint path
 checkpoint_tracking: ''
 checkpoint_catching: ''
-checkpoint_tracing: ''
+checkpoint_tracing: 'assets/models/trace.pth'
 # checkpoint_tracking: 'assets/models/track.pth'
 # checkpoint_catching: 'assets/models/catch_two_stage.pth'
 

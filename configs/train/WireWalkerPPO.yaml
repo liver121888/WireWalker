@@ -44,7 +44,7 @@ ppo:
   # horizon_length: 64
 
   horizon_length: 64
-  minibatch_size: 64
+  minibatch_size: 512
   mini_epochs: 6
   critic_coef: 4
   clip_value: True

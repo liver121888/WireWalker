@@ -315,6 +315,7 @@ class WireWalkerVecEnv(gym.Env):
             self.waypoint_pos.append([pt["x"], pt["y"], pt["z"]])
             self.waypoint_quat.append([pt['qw'], pt['qx'], pt['qy'], pt['qz']])
         
+        self.prev_waypoint_idx = 0
         self.last_waypoint_idx = 0
         self.waypoint_num = len(self.waypoint_pos)
         print("Got", self.waypoint_num, "waypoints")
@@ -737,7 +738,7 @@ class WireWalkerVecEnv(gym.Env):
         self.vel_init = False
         self.object_throw = False
         self.steps = 0
-        self.last_waypoint_idx = 0 #start from the start
+        self.last_waypoint_idx = 0 # start from the start
         # Reset the time
         self.start_time = self.WireWalker.data.time
         self.catch_time = self.WireWalker.data.time - self.start_time
@@ -785,81 +786,108 @@ class WireWalkerVecEnv(gym.Env):
         )
         return np.linalg.norm(ctrl_array)
 
+    def quat_angle_loss(self, q1, q2):
+        q1 = np.array(q1)
+        q2 = np.array(q2)
+        dot = np.clip(np.abs(np.dot(q1, q2)), 0.0, 1.0)
+        angle = 2 * np.arccos(np.abs(dot))
+        return angle  # this is in radians
+
     def compute_reward(self, obs, info, ctrl):
-        # 初始化奖励和奖励信息字典
-        reward = 0.0
-        reward_info = {}
         
+        ## Object Position Reward (-inf, 0)
+        # Compute the closest distance the end-effector comes to the object
+
+        # keep getting closer
+        reward_base_pos = (
+            self.info["base_distance"] - info["base_distance"]
+        ) * WireWalkerCfg.reward_weights["r_base_pos"]
+        # keep getting closer
+        reward_ee_pos = (
+            self.info["ee_distance"] - info["ee_distance"]
+        ) * WireWalkerCfg.reward_weights["r_ee_pos"]
+        # precision_reward
+        reward_ee_precision = (
+            math.exp(-50 * info["ee_distance"] ** 2)
+            * WireWalkerCfg.reward_weights["r_precision"]
+        )
+
         # 1. 中心距离奖励 - 环与导线中心的距离
-        ee_distance = info["ee_distance"]
-        center_dist_reward = ee_distance * WireWalkerCfg.reward_weights["r_center_dist"]
-        reward += center_dist_reward
-        reward_info["center_dist"] = center_dist_reward
-        
-        # 2. 精确度奖励 - 接近理想距离
-        ideal_distance = 0.05  # 理想距离为5厘米
-        precision_reward = np.exp(-50 * (ee_distance - ideal_distance)**2) * WireWalkerCfg.reward_weights["r_precision"]
-        reward += precision_reward
-        reward_info["precision"] = precision_reward
-        
-        # 3. 碰撞惩罚 - 检测与导线的碰撞
-        collision_reward = 0
-        if self.contacts["object_contacts"].size > 0:
-            collision_reward = WireWalkerCfg.reward_weights["r_collision"]
-            reward += collision_reward
-        reward_info["collision"] = collision_reward
-        
-        # 4. 进度奖励 - 沿着轨道的前进
-        progress_reward = 0
-        if hasattr(self, 'prev_waypoint_idx'):
-            waypoint_idx = self.last_waypoint_idx
-            if self.prev_waypoint_idx < waypoint_idx:
-                progress_reward = (waypoint_idx - self.prev_waypoint_idx) * WireWalkerCfg.reward_weights["r_progress"]
-                self.prev_waypoint_idx = waypoint_idx
-        else:
-            self.prev_waypoint_idx = self.last_waypoint_idx
-        reward += progress_reward
-        reward_info["progress"] = progress_reward
-        
-        # 5. 约束奖励 - 关节限制
-        constraint_reward = WireWalkerCfg.reward_weights["r_constraint"] if self.arm_limit else 0
-        reward += constraint_reward
-        reward_info["constraint"] = constraint_reward
-        
+        # ee_distance = info["ee_distance"]
+        # center_dist_reward = ee_distance * WireWalkerCfg.reward_weights["r_center_dist"]
+
+        # reward_orient = (
+        #     quat_loss * WireWalkerCfg.reward_weights["r_orient"]
+        # )
+        reward_orient = 0.0
+        if info["ee_distance"] < 0.03:  # or any small threshold
+            quat_loss = self.quat_angle_loss(obs["arm"]["ee_quat"], obs["wire"]["quat"])
+            reward_orient = -quat_loss * WireWalkerCfg.reward_weights["r_orient"]
+
         # 6. 控制惩罚 - 惩罚过大的控制输入
-        base_ctrl = np.linalg.norm(ctrl["base"])
-        arm_ctrl = np.linalg.norm(ctrl["arm"])
-        ctrl_penalty = base_ctrl * WireWalkerCfg.reward_weights["r_ctrl"]["base"] + \
-                        arm_ctrl * WireWalkerCfg.reward_weights["r_ctrl"]["arm"]
-        reward += ctrl_penalty
-        reward_info["ctrl"] = ctrl_penalty
+        reward_ctrl = -1.0 * self.norm_ctrl(ctrl, {"base", "arm"})
+
+        # 3. 碰撞惩罚 - 检测与导线的碰撞
+        reward_collision = 0.0
+        if self.contacts["object_contacts"].size > 0:
+            reward_collision = -1.0 * WireWalkerCfg.reward_weights["r_collision"]
+
+        # Constraint Penalty
+        # 5. 约束奖励 - 关节限制
+        # Compute the Penalty when the arm joint position is out of the joint limits
+        reward_constraint = 0 if self.arm_limit else -1
+        reward_constraint *= WireWalkerCfg.reward_weights["r_constraint"]
+
+        # 4. 进度奖励 - 沿着轨道的前进
+        reward_progress = 0
+        advance_num = self.last_waypoint_idx - self.prev_waypoint_idx
+        if (advance_num) > 0:
+            advance_num * WireWalkerCfg.reward_weights["r_progress"]
+            self.prev_waypoint_idx = self.last_waypoint_idx
+
+        # if hasattr(self, 'prev_waypoint_idx'):
+        #     waypoint_idx = self.last_waypoint_idx
+        #     if self.prev_waypoint_idx < waypoint_idx:
+        #         reward_progress = (waypoint_idx - self.prev_waypoint_idx) * WireWalkerCfg.reward_weights["r_progress"]
+        #         self.prev_waypoint_idx = waypoint_idx
+        # else:
+        #     self.prev_waypoint_idx = self.last_waypoint_idx
         
+                
         # 7. 时间惩罚 - 鼓励快速完成
-        time_penalty = WireWalkerCfg.reward_weights["r_time"]
-        reward += time_penalty
-        reward_info["time"] = time_penalty
+        reward_time = -1.0 * WireWalkerCfg.reward_weights["r_time"]
+
+        # sum up the rewards
+        rewards = (
+            reward_base_pos
+            + reward_ee_pos
+            + reward_ee_precision
+            + reward_orient
+            + reward_ctrl
+            + reward_collision
+            + reward_constraint
+            + reward_progress
+            + reward_time
+        )
         
         # 如果打印奖励信息
         if self.print_reward:
             print("\n===== 奖励详情 =====")
-            print(f"距离: {ee_distance:.4f}m")
-            print(f"中心距离奖励: {center_dist_reward:.4f}")
-            print(f"精确度奖励: {precision_reward:.4f}")
-            print(f"碰撞惩罚: {collision_reward:.4f}")
-            print(f"进度奖励: {progress_reward:.4f}")
-            print(f"约束奖励: {constraint_reward:.4f}")
-            print(f"控制惩罚: {ctrl_penalty:.4f}")
-            print(f"时间惩罚: {time_penalty:.4f}")
-            print(f"总奖励: {reward:.4f}")
+            print(f"BASE距离: {reward_base_pos:.4f}m")
+            print(f"EE距离: {reward_ee_pos:.4f}m")
+            print(f"精确度奖励: {reward_ee_precision:.4f}")
+            print(f"姿態奖励: {reward_orient:.4f}")
+            print(f"控制惩罚: {reward_ctrl:.4f}")
+            print(f"碰撞惩罚: {reward_collision:.4f}")
+            print(f"约束奖励: {reward_constraint:.4f}")
+            print(f"进度奖励: {reward_progress:.4f}")
+            print(f"时间惩罚: {reward_time:.4f}")
+            print(f"总奖励: {rewards:.4f}")
             print("====================\n")
         
-        # 保存奖励信息到info字典
-        info["reward_info"] = reward_info
-        
-        return reward
+        return rewards
 
 
-    # TODO: modify the reward function
     def compute_reward_original(self, obs, info, ctrl):
         """
         Rewards:
@@ -1132,6 +1160,7 @@ class WireWalkerVecEnv(gym.Env):
         # Design the reward function
         # Before we update the info, we need to compute the reward
         reward = self.compute_reward(obs, info, action)
+
         # reward = 0 # temporarily
         # Update the info
         self.info["base_distance"] = info["base_distance"]
@@ -1303,8 +1332,8 @@ class WireWalkerVecEnv(gym.Env):
             # print("self.WireWalker.data.body('link6'):", self.WireWalker.data.body('link6'))
             observation, reward, terminated, truncated, info = self.step(actions_dict)
             total_reward += reward
-            print(f"当前奖励: {reward:.4f}")
-            print(f"累计奖励: {total_reward:.4f}")
+            if self.print_reward:
+                print(f"累计回報: {total_reward:.4f}")
 
 if __name__ == "__main__":
     os.chdir("../../")
