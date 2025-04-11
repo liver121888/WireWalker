@@ -322,6 +322,8 @@ class WireWalkerVecEnv(gym.Env):
         print("Got", self.waypoint_num, "waypoints")
         # print(self.waypoint_pos)
 
+        self.steps_at_current_waypoint = 0
+        self.waypoint_timeout = 100  # Adjust based on your environment
 
         # get the distance between the end effector and the waypoint in wire
         self.info = self._get_info()
@@ -741,6 +743,7 @@ class WireWalkerVecEnv(gym.Env):
         self.steps = 0
         self.last_waypoint_idx = 0 # start from the start
         self.prev_waypoint_idx = 0 # start from the start
+        self.steps_at_current_waypoint = 0
         # reset the return
         self.total_return = 0.0
 
@@ -847,7 +850,18 @@ class WireWalkerVecEnv(gym.Env):
         if (advance_num) > 0:
             reward_progress = advance_num * WireWalkerCfg.reward_weights["r_progress"]
             self.prev_waypoint_idx = self.last_waypoint_idx
+            self.steps_at_current_waypoint = 0
+        else:
+            self.steps_at_current_waypoint += 1
+
         
+        # Add timeout penalty
+        reward_timeout = 0.0        
+        if self.steps_at_current_waypoint > self.waypoint_timeout:
+            reward_timeout = -0.5 * (self.steps_at_current_waypoint - self.waypoint_timeout)
+
+            
+
                 
         # 7. 时间惩罚 - 鼓励快速完成
         reward_time = WireWalkerCfg.reward_weights["r_time"]
@@ -862,6 +876,7 @@ class WireWalkerVecEnv(gym.Env):
             + reward_collision
             + reward_constraint
             + reward_progress
+            + reward_timeout
             + reward_time
         )
         
@@ -876,6 +891,7 @@ class WireWalkerVecEnv(gym.Env):
             print(f"碰撞惩罚: {reward_collision:.4f}")
             print(f"约束惩罚: {reward_constraint:.4f}")
             print(f"进度奖励: {reward_progress:.4f}")
+            print(f"超时惩罚: {reward_timeout:.4f}")
             print(f"时间惩罚: {reward_time:.4f}")
             print(f"总奖励: {rewards:.4f}")
             print("====================\n")
@@ -1150,6 +1166,7 @@ class WireWalkerVecEnv(gym.Env):
                 print("### Tracing Success!!!")
                 self.terminated = True
 
+        # Update waypoint timeout counter
         self.advance_waypoint()
 
         # Design the reward function
