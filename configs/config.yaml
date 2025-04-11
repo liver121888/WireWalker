@@ -34,6 +34,24 @@ experiment: ''
 #   "r_time": -0.5,
 # }
 
+# 'Apr 11 11:02', add timout -0.1, with timeout threshold 50
+
+# reward_weights = {
+#   "r_base_pos": 0.0,
+#   "r_ee_pos": 2.0,
+#   "r_precision": 0.5,
+#   "r_orient": -1.0,
+#   "r_ctrl": {
+#       'base': -0.1,
+#       'arm': -0.5,
+#   },
+#   "r_collision": -15.0,
+#   "r_constraint": -1.0,
+#   "r_progress": 500.0,
+#   "r_time": -0.5,
+# }
+# timeout: -0.5
+
 # seed - set to -1 to choose random seed
 seed: -1
 # set to True for deterministic performance
@@ -43,9 +61,9 @@ rl_device: ???
 device_id: 0  # 'cuda:?', -1 for 'cpu'
 
 # Disables viewer
-viewer: True
-test: True # False, True
-num_envs: 1 # This should be no more than 2x your CPUs (1x is recommended)
+viewer: False
+test: False # False, True
+num_envs: 4 # This should be no more than 2x your CPUs (1x is recommended)
 task: Tracing # Catching_TwoStage, Catching_OneStage, Tracking
 # used to set checkpoint path
 checkpoint_tracking: ''
