@@ -7,31 +7,18 @@ path = os.path.realpath(__file__)
 root = str(Path(path).parent)
 ASSET_PATH = os.path.join(root, "../../assets")
 # print("ASSET_PATH: ", ASSET_PATH)
-# Use Leap Hand
-# XML_DCMM_LEAP_OBJECT_PATH = "urdf/x1_xarm6_stick.xml"
+
 XML_WIREWALKER_WIRE_PATH = "urdf/x1_xarm6_stick_wire.xml"
 XML_WIREWALKER_UNSEEN_WIRE_PATH = "urdf/x1_xarm6_stick_wire.xml"
-# XML_DCMM_LEAP_UNSEEN_OBJECT_PATH = "urdf/x1_xarm6_leap_right_unseen_object.xml"
 XML_ARM_PATH = "urdf/xarm6_right.xml"
 
 WAYPOINT_DIST_EPSILON = 1e-2 # L2 distance to waypoint to say we 'reached' a waypoint
-## Weight Saved Path
 WEIGHT_PATH = os.path.join(ASSET_PATH, "weights")
-
-## The distance threshold to change the stage from 'tracking' to 'grasping'
-# distance_thresh = 0.25
 
 ## Define the initial joint positions of the arm and the hand
 arm_joints = np.array([
    0.0, 0.0, -0.0, 3.07, 2.25, -1.5 
 ])
-
-# hand_joints = np.array([
-#     0.0, 0.0, 0.0, 0.0,
-#     0.0, 0.0, 0.0, 0.0,
-#     0.0, 0.0, 0.0, 0.0,
-#     0.0, 0.0, 0.0, 0.0,
-# ])
 
 ## Define the reward weights
 # reward_weights = {
@@ -54,19 +41,35 @@ arm_joints = np.array([
 # }
 
 # gwen version
+# reward_weights = {
+#     "r_base_pos": 0.0,
+#     "r_ee_pos": 5.0,
+#     "r_precision": 1.0,
+#     "r_orient": -1.0,
+#     "r_ctrl": {
+#         'base': -0.2,
+#         'arm': -1.0,
+#     },
+#     "r_collision": -15.0,
+#     "r_constraint": -1.0,
+#     "r_progress": 300.0,
+#     "r_time": -1.0,
+# }
+
+# Claude version
 reward_weights = {
     "r_base_pos": 0.0,
-    "r_ee_pos": 10.0,
-    "r_precision": 10.0,
-    "r_orient": 10.0,
+    "r_ee_pos": 2.0,         # Reduce from 5.0 to 2.0
+    "r_precision": 0.5,       # Reduce from 1.0 to 0.5
+    "r_orient": -1.0,
     "r_ctrl": {
-        'base': 0.2,
-        'arm': 1.0,
+        'base': -0.1,         # Reduce penalty from -0.2 to -0.1
+        'arm': -0.5,          # Reduce penalty from -1.0 to -0.5
     },
-    "r_collision": 15.0,
-    "r_constraint": 1.0,
-    "r_progress": 500.0,
-    "r_time": 1e-2,
+    "r_collision": -15.0,
+    "r_constraint": -1.0,
+    "r_progress": 500.0,      # Increase from 300.0 to 500.0
+    "r_time": -0.5,           # Reduce time penalty
 }
 
 

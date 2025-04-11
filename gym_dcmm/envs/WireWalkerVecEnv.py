@@ -295,6 +295,7 @@ class WireWalkerVecEnv(gym.Env):
         self.catch_time = self.WireWalker.data.time - self.start_time
         self.reward_touch = 0
         self.reward_stability = 0
+        self.total_return = 0.0
         self.env_time = env_time
         self.steps = 0 
 
@@ -739,6 +740,10 @@ class WireWalkerVecEnv(gym.Env):
         self.object_throw = False
         self.steps = 0
         self.last_waypoint_idx = 0 # start from the start
+        self.prev_waypoint_idx = 0 # start from the start
+        # reset the return
+        self.total_return = 0.0
+
         # Reset the time
         self.start_time = self.WireWalker.data.time
         self.catch_time = self.WireWalker.data.time - self.start_time
@@ -779,10 +784,7 @@ class WireWalkerVecEnv(gym.Env):
         Return: norm, float
         """
         ctrl_array = np.concatenate(
-            [
-                ctrl[component] * WireWalkerCfg.reward_weights["r_ctrl"][component]
-                for component in components
-            ]
+            [ctrl[component] * WireWalkerCfg.reward_weights["r_ctrl"][component] for component in components]
         )
         return np.linalg.norm(ctrl_array)
 
@@ -820,42 +822,35 @@ class WireWalkerVecEnv(gym.Env):
         #     quat_loss * WireWalkerCfg.reward_weights["r_orient"]
         # )
         reward_orient = 0.0
-        if info["ee_distance"] < 0.03:  # or any small threshold
-            quat_loss = self.quat_angle_loss(obs["arm"]["ee_quat"], obs["wire"]["quat"])
-            reward_orient = -quat_loss * WireWalkerCfg.reward_weights["r_orient"]
+        # if info["ee_distance"] < WireWalkerCfg.WAYPOINT_DIST_EPSILON:  # or any small threshold
+        #     quat_loss = self.quat_angle_loss(obs["arm"]["ee_quat"], obs["wire"]["quat"])
+        #     reward_orient = quat_loss * WireWalkerCfg.reward_weights["r_orient"]
 
         # 6. 控制惩罚 - 惩罚过大的控制输入
-        reward_ctrl = -1.0 * self.norm_ctrl(ctrl, {"base", "arm"})
+        reward_ctrl = self.norm_ctrl(ctrl, {"base", "arm"})
 
         # 3. 碰撞惩罚 - 检测与导线的碰撞
         reward_collision = 0.0
         if self.contacts["object_contacts"].size > 0:
-            reward_collision = -1.0 * WireWalkerCfg.reward_weights["r_collision"]
+            reward_collision = WireWalkerCfg.reward_weights["r_collision"]
 
         # Constraint Penalty
         # 5. 约束奖励 - 关节限制
         # Compute the Penalty when the arm joint position is out of the joint limits
-        reward_constraint = 0 if self.arm_limit else -1
+        reward_constraint = 0 if self.arm_limit else 1
         reward_constraint *= WireWalkerCfg.reward_weights["r_constraint"]
 
         # 4. 进度奖励 - 沿着轨道的前进
         reward_progress = 0
         advance_num = self.last_waypoint_idx - self.prev_waypoint_idx
+        # print("advance_num: ", advance_num)
         if (advance_num) > 0:
-            advance_num * WireWalkerCfg.reward_weights["r_progress"]
+            reward_progress = advance_num * WireWalkerCfg.reward_weights["r_progress"]
             self.prev_waypoint_idx = self.last_waypoint_idx
-
-        # if hasattr(self, 'prev_waypoint_idx'):
-        #     waypoint_idx = self.last_waypoint_idx
-        #     if self.prev_waypoint_idx < waypoint_idx:
-        #         reward_progress = (waypoint_idx - self.prev_waypoint_idx) * WireWalkerCfg.reward_weights["r_progress"]
-        #         self.prev_waypoint_idx = waypoint_idx
-        # else:
-        #     self.prev_waypoint_idx = self.last_waypoint_idx
         
                 
         # 7. 时间惩罚 - 鼓励快速完成
-        reward_time = -1.0 * WireWalkerCfg.reward_weights["r_time"]
+        reward_time = WireWalkerCfg.reward_weights["r_time"]
 
         # sum up the rewards
         rewards = (
@@ -873,13 +868,13 @@ class WireWalkerVecEnv(gym.Env):
         # 如果打印奖励信息
         if self.print_reward:
             print("\n===== 奖励详情 =====")
-            print(f"BASE距离: {reward_base_pos:.4f}m")
-            print(f"EE距离: {reward_ee_pos:.4f}m")
+            print(f"BASE距离奖励/惩罚: {reward_base_pos:.4f}")
+            print(f"EE距离奖励/惩罚: {reward_ee_pos:.4f}")
             print(f"精确度奖励: {reward_ee_precision:.4f}")
-            print(f"姿態奖励: {reward_orient:.4f}")
+            print(f"姿態惩罚: {reward_orient:.4f}")
             print(f"控制惩罚: {reward_ctrl:.4f}")
             print(f"碰撞惩罚: {reward_collision:.4f}")
-            print(f"约束奖励: {reward_constraint:.4f}")
+            print(f"约束惩罚: {reward_constraint:.4f}")
             print(f"进度奖励: {reward_progress:.4f}")
             print(f"时间惩罚: {reward_time:.4f}")
             print(f"总奖励: {rewards:.4f}")
@@ -1303,7 +1298,6 @@ class WireWalkerVecEnv(gym.Env):
         self.reset()
         # action = np.zeros(18)
         action = np.zeros(6)
-        total_reward = 0.0
         while True:
             # Note: action's dim = 18, which includes 2 for the base, 4 for the arm, and 12 for the hand
             # Keyboard control
@@ -1331,9 +1325,10 @@ class WireWalkerVecEnv(gym.Env):
             }
             # print("self.WireWalker.data.body('link6'):", self.WireWalker.data.body('link6'))
             observation, reward, terminated, truncated, info = self.step(actions_dict)
-            total_reward += reward
+            if not (terminated or truncated):
+                self.total_return += reward
             if self.print_reward:
-                print(f"累计回報: {total_reward:.4f}")
+                print(f"累计回報: {self.total_return:.4f}")
 
 if __name__ == "__main__":
     os.chdir("../../")

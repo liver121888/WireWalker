@@ -9,7 +9,7 @@ network:
   separate_value_mlp: True
 
 ppo:
-  name: ${resolve_default:Dcmm,${...experiment}}
+  name: ${resolve_default:WireWalker,${...experiment}}
   normalize_input: True
   normalize_value: True
   value_bootstrap: True
