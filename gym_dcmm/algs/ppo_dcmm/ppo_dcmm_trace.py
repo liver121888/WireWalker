@@ -452,6 +452,16 @@ class PPO_Trace(object):
                 # only log scalars
                 if isinstance(v, float) or isinstance(v, int) or (isinstance(v, torch.Tensor) and len(v.shape) == 0):
                     self.extra_info[k] = v
+            
+            if 'reward_info' in infos and len(infos['reward_info']) > 0:
+                # print("infos['reward_info']: ", infos['reward_info'])
+                for reward_info in infos['reward_info']:
+                    if reward_info is not None:
+                        for k, v in reward_info.items():
+                            # only log scalars
+                            if isinstance(v, float) or isinstance(v, int) or (isinstance(v, torch.Tensor) and len(v.shape) == 0):
+                                self.extra_info['reward_'+k] = v
+                        break
 
             not_dones = 1.0 - self.dones.float()
 
