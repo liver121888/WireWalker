@@ -56,14 +56,13 @@ arm_joints = np.array([
 # gwen version
 reward_weights = {
     "r_center_dist": 1.0,
-    "r_precision": 10.0,
-    "r_constraint": 1.0,
-    "r_stability": 20.0,
+    "r_precision": 5.0,
+    "r_constraint": -1.0,
     "r_ctrl": {
         'base': -0.2,
         'arm': -1.0,
     },
-    "r_collision": -15.0,
+    "r_collision": -1.0,
     "r_progress": 10.0,
     "r_goal": 100.0,
     "r_time": -1e-2,

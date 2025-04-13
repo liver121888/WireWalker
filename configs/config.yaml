@@ -36,7 +36,7 @@ checkpoint_tracing: ''
 
 # wandb config
 output_name: WireWalker
-wandb_mode: "disabled"  # "online" | "offline" | "disabled"
+wandb_mode: "online"  # "online" | "offline" | "disabled"
 wandb_entity: 'wirewalker'
 # wandb_project: 'RL_Dcmm_Track_Random'
 wandb_project: 'sandbox_reward_tuning'
