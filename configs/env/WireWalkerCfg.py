@@ -14,7 +14,7 @@ XML_WIREWALKER_UNSEEN_WIRE_PATH = "urdf/x1_xarm6_stick_wire.xml"
 # XML_DCMM_LEAP_UNSEEN_OBJECT_PATH = "urdf/x1_xarm6_leap_right_unseen_object.xml"
 XML_ARM_PATH = "urdf/xarm6_right.xml"
 
-WAYPOINT_DIST_EPSILON = 1e-2 # L2 distance to waypoint to say we 'reached' a waypoint
+WAYPOINT_DIST_EPSILON = 5e-2 # L2 distance to waypoint to say we 'reached' a waypoint
 ## Weight Saved Path
 WEIGHT_PATH = os.path.join(ASSET_PATH, "weights")
 
@@ -56,13 +56,13 @@ arm_joints = np.array([
 # gwen version
 reward_weights = {
     "r_center_dist": 1.0,
-    "r_precision": 5.0,
+    "r_precision": 3.0,
     "r_constraint": -1.0,
     "r_ctrl": {
-        'base': -0.2,
-        'arm': -1.0,
+        'base': -0.5,
+        'arm': -0.2,
     },
-    "r_collision": -1.0,
+    "r_collision": -0.5,
     "r_progress": 10.0,
     "r_goal": 100.0,
     "r_time": -1e-2,

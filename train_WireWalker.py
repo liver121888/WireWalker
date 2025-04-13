@@ -62,7 +62,7 @@ def main(config: DictConfig):
                     imshow_cam = config.imshow_cam, 
                     viewer = config.viewer,
                     print_obs = False, print_info = False,
-                    print_reward = True, print_ctrl = False,
+                    print_reward = False, print_ctrl = False,
                     print_contacts = False, wire_eval = config.wire_eval,
                     env_time = 2.5, steps_per_policy = 20)
 

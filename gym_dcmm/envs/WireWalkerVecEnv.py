@@ -797,8 +797,8 @@ class WireWalkerVecEnv(gym.Env):
         # reward_info["center_dist"] = center_dist_reward
         
         # 2. 精确度奖励 - 接近理想距离
-        ideal_distance = 0.05  # 理想距离为5厘米
-        precision_reward = np.exp(-50 * (ee_distance - ideal_distance)**2) * WireWalkerCfg.reward_weights["r_precision"]
+        precision_reward_factor = min(1, np.exp(-50 * (ee_distance)**2))
+        precision_reward = precision_reward_factor * WireWalkerCfg.reward_weights["r_precision"]
         reward += precision_reward
         reward_info["precision"] = precision_reward
         
@@ -808,19 +808,11 @@ class WireWalkerVecEnv(gym.Env):
             collision_reward = WireWalkerCfg.reward_weights["r_collision"]
             reward += collision_reward
         reward_info["collision"] = collision_reward
-        
         # 4. 进度奖励 - 沿着轨道的前进
-        progress_reward = 0
-        if hasattr(self, 'prev_waypoint_idx'):
-            waypoint_idx = self.last_waypoint_idx
-            if self.prev_waypoint_idx < waypoint_idx:
-                progress_reward = (waypoint_idx - self.prev_waypoint_idx) * WireWalkerCfg.reward_weights["r_progress"]
-                self.prev_waypoint_idx = waypoint_idx
-        else:
-            self.prev_waypoint_idx = self.last_waypoint_idx
+        _num_pts_passed = self.advance_waypoint()
+        progress_reward = _num_pts_passed * WireWalkerCfg.reward_weights["r_progress"]
         reward += progress_reward
         reward_info["progress"] = progress_reward
-
         goal_reward = 0
         if self.last_waypoint_idx >= self.waypoint_num - 1:
             goal_reward = WireWalkerCfg.reward_weights["r_goal"]
@@ -1104,11 +1096,14 @@ class WireWalkerVecEnv(gym.Env):
 
     def advance_waypoint(self):
         ee_abs_pose = self._get_absolute_ee_pos3d().squeeze()
+        _num_pts_advanced = 0
         
         while self.last_waypoint_idx < self.waypoint_num and \
                 np.linalg.norm(ee_abs_pose - self.waypoint_pos[self.last_waypoint_idx]) < WireWalkerCfg.WAYPOINT_DIST_EPSILON:
-            # print("Moved past waypoint", self.last_waypoint_idx)
+            print("Moved past waypoint", self.last_waypoint_idx)
             self.last_waypoint_idx += 1
+            _num_pts_advanced += 1
+        return _num_pts_advanced
 
     def step(self, action):
         self.steps += 1
@@ -1135,7 +1130,6 @@ class WireWalkerVecEnv(gym.Env):
                 print("### Tracing Success!!!")
                 self.terminated = True
 
-        self.advance_waypoint()
 
         # Design the reward function
         # Before we update the info, we need to compute the reward
@@ -1311,8 +1305,9 @@ class WireWalkerVecEnv(gym.Env):
             # print("self.WireWalker.data.body('link6'):", self.WireWalker.data.body('link6'))
             observation, reward, terminated, truncated, info = self.step(actions_dict)
             total_reward += reward
-            print(f"当前奖励: {reward:.4f}")
-            print(f"累计奖励: {total_reward:.4f}")
+            print("ee dist", info["ee_distance"])
+            # print(f"当前奖励: {reward:.4f}")
+            # print(f"累计奖励: {total_reward:.4f}")
 
 if __name__ == "__main__":
     os.chdir("../../")
