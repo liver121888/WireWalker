@@ -1,41 +1,9 @@
 # experiment name. defaults to name of training config
 experiment: ''
 
-# 'Apr 11 01:08'
-# reward_weights = {
-#     "r_base_pos": 0.0,
-#     "r_ee_pos": 5.0,
-#     "r_precision": 1.0,
-#     "r_orient": -1.0,
-#     "r_ctrl": {
-#         'base': -0.2,
-#         'arm': -1.0,
-#     },
-#     "r_collision": -15.0,
-#     "r_constraint": -1.0,
-#     "r_progress": 300.0,
-#     "r_time": -1.0,
-# }
-
 # 'Apr 11 02:34', add timout -0.1, with timeout threshold 50
 
-# reward_weights = {
-#   "r_base_pos": 0.0,
-#   "r_ee_pos": 2.0,
-#   "r_precision": 0.5,
-#   "r_orient": -1.0,
-#   "r_ctrl": {
-#       'base': -0.1,
-#       'arm': -0.5,
-#   },
-#   "r_collision": -15.0,
-#   "r_constraint": -1.0,
-#   "r_progress": 500.0,
-#   "r_time": -0.5,
-# }
-
 # 'Apr 11 11:02', add timout -0.1, with timeout threshold 50
-
 # reward_weights = {
 #   "r_base_pos": 0.0,
 #   "r_ee_pos": 2.0,
@@ -52,6 +20,23 @@ experiment: ''
 # }
 # timeout: -0.5
 
+# 'Apr 13 22:47', add timout -0.1, with timeout threshold 50
+# remove precision reward, reduce collision penalty
+# reward_weights = {
+#     "r_base_pos": 0.0,
+#     "r_ee_pos": 2.0,         # Reduce from 5.0 to 2.0
+#     "r_precision": 0.0,       # Reduce from 1.0 to 0.5
+#     "r_orient": -1.0,
+#     "r_ctrl": {
+#         'base': -0.1,         # Reduce penalty from -0.2 to -0.1
+#         'arm': -0.5,          # Reduce penalty from -1.0 to -0.5
+#     },
+#     "r_collision": -5.0,
+#     "r_constraint": -1.0,
+#     "r_progress": 500.0,      # Increase from 300.0 to 500.0
+#     "r_time": -0.5,           # Reduce time penalty
+# }
+
 # seed - set to -1 to choose random seed
 seed: -1
 # set to True for deterministic performance
@@ -61,21 +46,9 @@ rl_device: ???
 device_id: 0  # 'cuda:?', -1 for 'cpu'
 
 # Disables viewer
-viewer: False
-test: False # False, True
-num_envs: 4 # This should be no more than 2x your CPUs (1x is recommended)
-task: Tracing # Catching_TwoStage, Catching_OneStage, Tracking
-# used to set checkpoint path
-checkpoint_tracking: ''
-checkpoint_catching: ''
-checkpoint_tracing: ''
-# checkpoint_tracing: 'assets/models/trace.pth'
-# checkpoint_tracking: 'assets/models/track.pth'
-# checkpoint_catching: 'assets/models/catch_two_stage.pth'
-
-# camera visualization
-imshow_cam: False
-
+test: True # False, True
+viewer: True # False, True
+num_envs: 1 # This should be no more than 2x your CPUs (1x is recommended)
 # make sure to set batch_size, minibatch_size according to num_envs in WireWalkerPPO.yaml
 # self.batch_size = self.horizon_length * self.num_actors
 # num_actors = num_envs
@@ -83,16 +56,32 @@ imshow_cam: False
 # num_envs: 8
 # minibatch_size: 512
 # horizon_length: 64
+task: Tracing # Catching_TwoStage, Catching_OneStage, Tracking
+# used to set checkpoint path
+checkpoint_tracking: ''
+checkpoint_catching: ''
+# checkpoint_tracing: ''
+checkpoint_tracing: 'assets/models/last.pth'
+# checkpoint_tracking: 'assets/models/track.pth'
+# checkpoint_catching: 'assets/models/catch_two_stage.pth'
 
-# num_envs: 8 # This should be no more than 2x your CPUs (1x is recommended)
+print_info: False # False, True
+print_reward: False # False, True
+print_contacts: False # False, True
+print_ctrl: False # False, True
+print_obs: False # False, True
+wire_name: straight
 wire_eval: False
+
+# camera visualization
+imshow_cam: False
 
 # wandb config
 output_name: WireWalker
 wandb_mode: "disabled"  # "online" | "offline" | "disabled"
-wandb_entity: 'Your_username'
+wandb_entity: 'wirewalker'
 # wandb_project: 'RL_Dcmm_Track_Random'
-wandb_project: 'RL_Dcmm_Catch_Random'
+wandb_project: 'sandbox_reward_tuning'
 
 # set default task and default training config based on task
 # currently we keep the same PPO settings for WireWalker

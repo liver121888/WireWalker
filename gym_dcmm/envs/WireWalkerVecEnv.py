@@ -323,7 +323,7 @@ class WireWalkerVecEnv(gym.Env):
         # print(self.waypoint_pos)
 
         self.steps_at_current_waypoint = 0
-        self.waypoint_timeout = 100  # Adjust based on your environment
+        self.waypoint_timeout = 20  # Adjust based on your environment
 
         # get the distance between the end effector and the waypoint in wire
         self.info = self._get_info()
@@ -802,20 +802,25 @@ class WireWalkerVecEnv(gym.Env):
         
         ## Object Position Reward (-inf, 0)
         # Compute the closest distance the end-effector comes to the object
+        reward_info = {}
 
         # keep getting closer
         reward_base_pos = (
             self.info["base_distance"] - info["base_distance"]
         ) * WireWalkerCfg.reward_weights["r_base_pos"]
+        reward_info["r_base_pos"] = reward_base_pos
+
         # keep getting closer
         reward_ee_pos = (
             self.info["ee_distance"] - info["ee_distance"]
         ) * WireWalkerCfg.reward_weights["r_ee_pos"]
+        reward_info["r_ee_pos"] = reward_ee_pos
+
         # precision_reward
         reward_ee_precision = (
             math.exp(-50 * info["ee_distance"] ** 2)
-            * WireWalkerCfg.reward_weights["r_precision"]
-        )
+        ) * WireWalkerCfg.reward_weights["r_precision"]
+        reward_info["r_precision"] = reward_ee_precision
 
         # 1. 中心距离奖励 - 环与导线中心的距离
         # ee_distance = info["ee_distance"]
@@ -830,18 +835,21 @@ class WireWalkerVecEnv(gym.Env):
         #     reward_orient = quat_loss * WireWalkerCfg.reward_weights["r_orient"]
 
         # 6. 控制惩罚 - 惩罚过大的控制输入
-        reward_ctrl = self.norm_ctrl(ctrl, {"base", "arm"})
+        reward_ctrl = self.norm_ctrl(ctrl, {"base", "arm"}) * WireWalkerCfg.reward_weights["r_ctrl"]["all"]
+        reward_info["r_ctrl"] = reward_ctrl
 
         # 3. 碰撞惩罚 - 检测与导线的碰撞
         reward_collision = 0.0
         if self.contacts["object_contacts"].size > 0:
             reward_collision = WireWalkerCfg.reward_weights["r_collision"]
+        reward_info["r_collision"] = reward_collision
 
         # Constraint Penalty
         # 5. 约束奖励 - 关节限制
         # Compute the Penalty when the arm joint position is out of the joint limits
         reward_constraint = 0 if self.arm_limit else 1
         reward_constraint *= WireWalkerCfg.reward_weights["r_constraint"]
+        reward_info["r_constraint"] = reward_constraint
 
         # 4. 进度奖励 - 沿着轨道的前进
         reward_progress = 0
@@ -853,18 +861,22 @@ class WireWalkerVecEnv(gym.Env):
             self.steps_at_current_waypoint = 0
         else:
             self.steps_at_current_waypoint += 1
+        reward_info["r_progress"] = reward_progress
 
         
         # Add timeout penalty
         reward_timeout = 0.0        
         if self.steps_at_current_waypoint > self.waypoint_timeout:
-            reward_timeout = -0.5 * (self.steps_at_current_waypoint - self.waypoint_timeout)
+            # maybe make it times 1
+            reward_timeout = (self.steps_at_current_waypoint - self.waypoint_timeout) * WireWalkerCfg.reward_weights["r_timeout"]
+            # reward_timeout = -0.5 * 1.0
 
+        reward_info["r_timeout"] = reward_timeout
             
-
                 
         # 7. 时间惩罚 - 鼓励快速完成
         reward_time = WireWalkerCfg.reward_weights["r_time"]
+        reward_info["r_time"] = reward_time
 
         # sum up the rewards
         rewards = (
@@ -882,201 +894,194 @@ class WireWalkerVecEnv(gym.Env):
         
         # 如果打印奖励信息
         if self.print_reward:
-            print("\n===== 奖励详情 =====")
-            print(f"BASE距离奖励/惩罚: {reward_base_pos:.4f}")
-            print(f"EE距离奖励/惩罚: {reward_ee_pos:.4f}")
-            print(f"精确度奖励: {reward_ee_precision:.4f}")
-            print(f"姿態惩罚: {reward_orient:.4f}")
-            print(f"控制惩罚: {reward_ctrl:.4f}")
-            print(f"碰撞惩罚: {reward_collision:.4f}")
-            print(f"约束惩罚: {reward_constraint:.4f}")
-            print(f"进度奖励: {reward_progress:.4f}")
-            print(f"超时惩罚: {reward_timeout:.4f}")
-            print(f"时间惩罚: {reward_time:.4f}")
-            print(f"总奖励: {rewards:.4f}")
+            print("\n===== reward_info =====")
+            for key, value in reward_info.items():
+                print(f"{key}: {value:.4f}")
             print("====================\n")
-        
+
+        info["reward_info"] = reward_info
+            
         return rewards
 
 
-    def compute_reward_original(self, obs, info, ctrl):
-        """
-        Rewards:
-        - Object Position Reward
-        - Object Orientation Reward
-        - Object Touch Success Reward
-        - Object Catch Stability Reward
-        - Collision Penalty
-        - Constraint Penalty
-        """
-        rewards = 0.0
-        ## Object Position Reward (-inf, 0)
-        # Compute the closest distance the end-effector comes to the object
-        reward_base_pos = (
-            self.info["base_distance"] - info["base_distance"]
-        ) * WireWalkerCfg.reward_weights["r_base_pos"]
-        reward_ee_pos = (
-            self.info["ee_distance"] - info["ee_distance"]
-        ) * WireWalkerCfg.reward_weights["r_ee_pos"]
-        reward_ee_precision = (
-            math.exp(-50 * info["ee_distance"] ** 2)
-            * WireWalkerCfg.reward_weights["r_precision"]
-        )
+    # def compute_reward_original(self, obs, info, ctrl):
+    #     """
+    #     Rewards:
+    #     - Object Position Reward
+    #     - Object Orientation Reward
+    #     - Object Touch Success Reward
+    #     - Object Catch Stability Reward
+    #     - Collision Penalty
+    #     - Constraint Penalty
+    #     """
+    #     rewards = 0.0
+    #     ## Object Position Reward (-inf, 0)
+    #     # Compute the closest distance the end-effector comes to the object
+    #     reward_base_pos = (
+    #         self.info["base_distance"] - info["base_distance"]
+    #     ) * WireWalkerCfg.reward_weights["r_base_pos"]
+    #     reward_ee_pos = (
+    #         self.info["ee_distance"] - info["ee_distance"]
+    #     ) * WireWalkerCfg.reward_weights["r_ee_pos"]
+    #     reward_ee_precision = (
+    #         math.exp(-50 * info["ee_distance"] ** 2)
+    #         * WireWalkerCfg.reward_weights["r_precision"]
+    #     )
 
-        ## Collision Penalty
-        # Compute the Penalty when the arm is collided with the mobile base
-        reward_collision = 0
-        if self.contacts["base_contacts"].size != 0:
-            reward_collision = WireWalkerCfg.reward_weights["r_collision"]
+    #     ## Collision Penalty
+    #     # Compute the Penalty when the arm is collided with the mobile base
+    #     reward_collision = 0
+    #     if self.contacts["base_contacts"].size != 0:
+    #         reward_collision = WireWalkerCfg.reward_weights["r_collision"]
 
-        ## Constraint Penalty
-        # Compute the Penalty when the arm joint position is out of the joint limits
-        reward_constraint = 0 if self.arm_limit else -1
-        reward_constraint *= WireWalkerCfg.reward_weights["r_constraint"]
+    #     ## Constraint Penalty
+    #     # Compute the Penalty when the arm joint position is out of the joint limits
+    #     reward_constraint = 0 if self.arm_limit else -1
+    #     reward_constraint *= WireWalkerCfg.reward_weights["r_constraint"]
 
-        ## Object Touch Success Reward
-        # Compute the reward when the object is caught successfully by the hand
-        if self.step_touch:
-            # print("TRACK SUCCESS!!!!!")
-            if not self.reward_touch:
-                self.catch_time = self.WireWalker.data.time - self.start_time
-            self.reward_touch = WireWalkerCfg.reward_weights["r_touch"][self.task]
-        else:
-            self.reward_touch = 0
+    #     ## Object Touch Success Reward
+    #     # Compute the reward when the object is caught successfully by the hand
+    #     if self.step_touch:
+    #         # print("TRACK SUCCESS!!!!!")
+    #         if not self.reward_touch:
+    #             self.catch_time = self.WireWalker.data.time - self.start_time
+    #         self.reward_touch = WireWalkerCfg.reward_weights["r_touch"][self.task]
+    #     else:
+    #         self.reward_touch = 0
 
-        if self.task == "Tracing":
-            # TODO: modify the reward function
-            # can copy from tracking
-            pass
-        elif self.task == "Tracking":
-            ## Ctrl Penalty
-            # Compute the norm of base and arm movement through the current actions in the grasping stage
-            reward_ctrl = -self.norm_ctrl(ctrl, {"base", "arm"})
-            ## Object Orientation Reward
-            # Compute the dot product of the velocity vector of the object and the z axis of the end_effector
-            rotation_matrix = quaternion_to_rotation_matrix(obs["arm"]["ee_quat"])
-            local_velocity_vector = np.dot(rotation_matrix.T, obs["object"]["v_lin_3d"])
-            hand_z_axis = np.array([0, 0, 1])
-            reward_orient = (
-                abs(cos_angle_between_vectors(local_velocity_vector, hand_z_axis))
-                * WireWalkerCfg.reward_weights["r_orient"]
-            )
-            ## Add up the rewards
-            rewards = (
-                reward_base_pos
-                + reward_ee_pos
-                + reward_ee_precision
-                + reward_orient
-                + reward_ctrl
-                + reward_collision
-                + reward_constraint
-                + self.reward_touch
-            )
-            if self.print_reward:
-                if reward_constraint < 0:
-                    print("ctrl: ", ctrl)
-                print("### print reward")
-                print(
-                    "reward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, reward_ctrl: {:.3f}, \n".format(
-                        reward_ee_pos, reward_ee_precision, reward_orient, reward_ctrl
-                    )
-                    + "reward_collision: {:.3f}, reward_constraint: {:.3f}, reward_touch: {:.3f}".format(
-                        reward_collision, reward_constraint, self.reward_touch
-                    )
-                )
-                print("total reward: {:.3f}\n".format(rewards))
-        elif self.task == "Catching":
-            reward_orient = 0
-            ## Calculate the total reward in different stages
-            if self.stage == "tracking":
-                ## Ctrl Penalty
-                # Compute the norm of hand joint movement through the current actions in the tracking stage
-                reward_ctrl = -self.norm_ctrl(ctrl, {"hand"})
-                ## Object Orientation Reward
-                # Compute the dot product of the velocity vector of the object and the z axis of the end_effector
-                rotation_matrix = quaternion_to_rotation_matrix(obs["arm"]["ee_quat"])
-                local_velocity_vector = np.dot(
-                    rotation_matrix.T, obs["object"]["v_lin_3d"]
-                )
-                hand_z_axis = np.array([0, 0, 1])
-                reward_orient = (
-                    abs(cos_angle_between_vectors(local_velocity_vector, hand_z_axis))
-                    * WireWalkerCfg.reward_weights["r_orient"]
-                )
-                ## Add up the rewards
-                rewards = (
-                    reward_base_pos
-                    + reward_ee_pos
-                    + reward_orient
-                    + reward_ctrl
-                    + reward_collision
-                    + reward_constraint
-                    + self.reward_touch
-                )
-                if self.print_reward:
-                    if reward_constraint < 0:
-                        print("ctrl: ", ctrl)
-                    print("### print reward")
-                    print(
-                        "reward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, reward_ctrl: {:.3f}, \n".format(
-                            reward_ee_pos,
-                            reward_ee_precision,
-                            reward_orient,
-                            reward_ctrl,
-                        )
-                        + "reward_collision: {:.3f}, reward_constraint: {:.3f}, reward_touch: {:.3f}".format(
-                            reward_collision, reward_constraint, self.reward_touch
-                        )
-                    )
-                    print("total reward: {:.3f}\n".format(rewards))
-            else:
-                ## Ctrl Penalty
-                # Compute the norm of base and arm movement through the current actions in the grasping stage
-                reward_ctrl = -self.norm_ctrl(ctrl, {"base", "arm"})
-                ## Set the Orientation Reward to maximum (1)
-                reward_orient = 1
-                ## Object Touch Stability Reward
-                # Compute the reward when the object is caught stably in the hand
-                if self.reward_touch:
-                    self.reward_stability = (
-                        info["env_time"] - self.catch_time
-                    ) * WireWalkerCfg.reward_weights["r_stability"]
-                else:
-                    self.reward_stability = 0.0
-                ## Add up the rewards
-                rewards = (
-                    reward_base_pos
-                    + reward_ee_pos
-                    + reward_ee_precision
-                    + reward_orient
-                    + reward_ctrl
-                    + reward_collision
-                    + reward_constraint
-                    + self.reward_touch
-                    + self.reward_stability
-                )
-                if self.print_reward:
-                    print("##### print reward")
-                    print(
-                        "reward_touch: {}, \nreward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, \n".format(
-                            self.reward_touch,
-                            reward_ee_pos,
-                            reward_ee_precision,
-                            reward_orient,
-                        )
-                        + "reward_stability: {:.3f}, reward_collision: {:.3f}, \nreward_ctrl: {:.3f}, reward_constraint: {:.3f}".format(
-                            self.reward_stability,
-                            reward_collision,
-                            reward_ctrl,
-                            reward_constraint,
-                        )
-                    )
-                    print("total reward: {:.3f}\n".format(rewards))
+    #     if self.task == "Tracing":
+    #         # TODO: modify the reward function
+    #         # can copy from tracking
+    #         pass
+    #     elif self.task == "Tracking":
+    #         ## Ctrl Penalty
+    #         # Compute the norm of base and arm movement through the current actions in the grasping stage
+    #         reward_ctrl = -self.norm_ctrl(ctrl, {"base", "arm"})
+    #         ## Object Orientation Reward
+    #         # Compute the dot product of the velocity vector of the object and the z axis of the end_effector
+    #         rotation_matrix = quaternion_to_rotation_matrix(obs["arm"]["ee_quat"])
+    #         local_velocity_vector = np.dot(rotation_matrix.T, obs["object"]["v_lin_3d"])
+    #         hand_z_axis = np.array([0, 0, 1])
+    #         reward_orient = (
+    #             abs(cos_angle_between_vectors(local_velocity_vector, hand_z_axis))
+    #             * WireWalkerCfg.reward_weights["r_orient"]
+    #         )
+    #         ## Add up the rewards
+    #         rewards = (
+    #             reward_base_pos
+    #             + reward_ee_pos
+    #             + reward_ee_precision
+    #             + reward_orient
+    #             + reward_ctrl
+    #             + reward_collision
+    #             + reward_constraint
+    #             + self.reward_touch
+    #         )
+    #         if self.print_reward:
+    #             if reward_constraint < 0:
+    #                 print("ctrl: ", ctrl)
+    #             print("### print reward")
+    #             print(
+    #                 "reward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, reward_ctrl: {:.3f}, \n".format(
+    #                     reward_ee_pos, reward_ee_precision, reward_orient, reward_ctrl
+    #                 )
+    #                 + "reward_collision: {:.3f}, reward_constraint: {:.3f}, reward_touch: {:.3f}".format(
+    #                     reward_collision, reward_constraint, self.reward_touch
+    #                 )
+    #             )
+    #             print("total reward: {:.3f}\n".format(rewards))
+    #     elif self.task == "Catching":
+    #         reward_orient = 0
+    #         ## Calculate the total reward in different stages
+    #         if self.stage == "tracking":
+    #             ## Ctrl Penalty
+    #             # Compute the norm of hand joint movement through the current actions in the tracking stage
+    #             reward_ctrl = -self.norm_ctrl(ctrl, {"hand"})
+    #             ## Object Orientation Reward
+    #             # Compute the dot product of the velocity vector of the object and the z axis of the end_effector
+    #             rotation_matrix = quaternion_to_rotation_matrix(obs["arm"]["ee_quat"])
+    #             local_velocity_vector = np.dot(
+    #                 rotation_matrix.T, obs["object"]["v_lin_3d"]
+    #             )
+    #             hand_z_axis = np.array([0, 0, 1])
+    #             reward_orient = (
+    #                 abs(cos_angle_between_vectors(local_velocity_vector, hand_z_axis))
+    #                 * WireWalkerCfg.reward_weights["r_orient"]
+    #             )
+    #             ## Add up the rewards
+    #             rewards = (
+    #                 reward_base_pos
+    #                 + reward_ee_pos
+    #                 + reward_orient
+    #                 + reward_ctrl
+    #                 + reward_collision
+    #                 + reward_constraint
+    #                 + self.reward_touch
+    #             )
+    #             if self.print_reward:
+    #                 if reward_constraint < 0:
+    #                     print("ctrl: ", ctrl)
+    #                 print("### print reward")
+    #                 print(
+    #                     "reward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, reward_ctrl: {:.3f}, \n".format(
+    #                         reward_ee_pos,
+    #                         reward_ee_precision,
+    #                         reward_orient,
+    #                         reward_ctrl,
+    #                     )
+    #                     + "reward_collision: {:.3f}, reward_constraint: {:.3f}, reward_touch: {:.3f}".format(
+    #                         reward_collision, reward_constraint, self.reward_touch
+    #                     )
+    #                 )
+    #                 print("total reward: {:.3f}\n".format(rewards))
+    #         else:
+    #             ## Ctrl Penalty
+    #             # Compute the norm of base and arm movement through the current actions in the grasping stage
+    #             reward_ctrl = -self.norm_ctrl(ctrl, {"base", "arm"})
+    #             ## Set the Orientation Reward to maximum (1)
+    #             reward_orient = 1
+    #             ## Object Touch Stability Reward
+    #             # Compute the reward when the object is caught stably in the hand
+    #             if self.reward_touch:
+    #                 self.reward_stability = (
+    #                     info["env_time"] - self.catch_time
+    #                 ) * WireWalkerCfg.reward_weights["r_stability"]
+    #             else:
+    #                 self.reward_stability = 0.0
+    #             ## Add up the rewards
+    #             rewards = (
+    #                 reward_base_pos
+    #                 + reward_ee_pos
+    #                 + reward_ee_precision
+    #                 + reward_orient
+    #                 + reward_ctrl
+    #                 + reward_collision
+    #                 + reward_constraint
+    #                 + self.reward_touch
+    #                 + self.reward_stability
+    #             )
+    #             if self.print_reward:
+    #                 print("##### print reward")
+    #                 print(
+    #                     "reward_touch: {}, \nreward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, \n".format(
+    #                         self.reward_touch,
+    #                         reward_ee_pos,
+    #                         reward_ee_precision,
+    #                         reward_orient,
+    #                     )
+    #                     + "reward_stability: {:.3f}, reward_collision: {:.3f}, \nreward_ctrl: {:.3f}, reward_constraint: {:.3f}".format(
+    #                         self.reward_stability,
+    #                         reward_collision,
+    #                         reward_ctrl,
+    #                         reward_constraint,
+    #                     )
+    #                 )
+    #                 print("total reward: {:.3f}\n".format(rewards))
 
-        else:
-            raise ValueError("Invalid task: {}".format(self.task))
+    #     else:
+    #         raise ValueError("Invalid task: {}".format(self.task))
 
-        return rewards
+    #     return rewards
 
     def _step_mujoco_simulation(self, action_dict):
 
@@ -1208,8 +1213,8 @@ class WireWalkerVecEnv(gym.Env):
         done = terminated or truncated
         if done:
             # TEST ONLY
-            print("### DONE ###")
-            self.reset()
+            # print("### DONE ###")
+            # self.reset()
             pass
         return obs, reward, terminated, truncated, info
 
@@ -1345,7 +1350,7 @@ class WireWalkerVecEnv(gym.Env):
             if not (terminated or truncated):
                 self.total_return += reward
             if self.print_reward:
-                print(f"累计回報: {self.total_return:.4f}")
+                print(f"Accumulated return: {self.total_return:.4f}")
 
 if __name__ == "__main__":
     os.chdir("../../")

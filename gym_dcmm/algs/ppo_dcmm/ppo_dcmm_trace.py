@@ -175,6 +175,9 @@ class PPO_Trace(object):
         self.obs = {'obs': self.obs2tensor(reset_obs)}
         self.agent_steps = self.batch_size
 
+        # TODO: save visualization
+        viz_freq = 10000
+
         while self.agent_steps < self.max_agent_steps:
             self.epoch_num += 1
             a_losses, c_losses, b_losses, entropies, kls = self.train_epoch()
@@ -213,6 +216,11 @@ class PPO_Trace(object):
                 'metrics/episode_success_per_step': mean_success,
             }, step=self.agent_steps)
             checkpoint_name = f'ep_{self.epoch_num}_step_{int(self.agent_steps // 1e6):04}m_reward_{mean_rewards:.2f}'
+
+            # if self.agent_steps % viz_freq == 0:
+            #     print("===== saving vizualization =====")
+            #     self.test()
+
 
             if self.save_freq > 0:
                 if (self.epoch_num % self.save_freq == 0) and (mean_rewards <= self.best_rewards):
@@ -452,6 +460,16 @@ class PPO_Trace(object):
                 # only log scalars
                 if isinstance(v, float) or isinstance(v, int) or (isinstance(v, torch.Tensor) and len(v.shape) == 0):
                     self.extra_info[k] = v
+            
+            if 'reward_info' in infos and len(infos['reward_info']) > 0:
+                # print("infos['reward_info']: ", infos['reward_info'])
+                for reward_info in infos['reward_info']:
+                    if reward_info is not None:
+                        for k, v in reward_info.items():
+                            # only log scalars
+                            if isinstance(v, float) or isinstance(v, int) or (isinstance(v, torch.Tensor) and len(v.shape) == 0):
+                                self.extra_info['reward_'+k] = v
+                        break
 
             not_dones = 1.0 - self.dones.float()
 

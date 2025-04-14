@@ -59,16 +59,18 @@ arm_joints = np.array([
 # Claude version
 reward_weights = {
     "r_base_pos": 0.0,
-    "r_ee_pos": 2.0,         # Reduce from 5.0 to 2.0
-    "r_precision": 0.5,       # Reduce from 1.0 to 0.5
+    "r_ee_pos": 5.0,         # Reduce from 5.0 to 2.0
+    "r_precision": 1.5,       # Reduce from 1.0 to 0.5
     "r_orient": -1.0,
     "r_ctrl": {
-        'base': -0.1,         # Reduce penalty from -0.2 to -0.1
-        'arm': -0.5,          # Reduce penalty from -1.0 to -0.5
+        'all': -1.0,
+        'base': -0.2,         # Reduce penalty from -0.2 to -0.1
+        'arm': -1.0,          # Reduce penalty from -1.0 to -0.5
     },
-    "r_collision": -15.0,
+    "r_collision": -0.5,
     "r_constraint": -1.0,
-    "r_progress": 500.0,      # Increase from 300.0 to 500.0
+    "r_progress": 800.0,      # Increase from 300.0 to 500.0
+    "r_timeout": -0.05,
     "r_time": -0.5,           # Reduce time penalty
 }
 
