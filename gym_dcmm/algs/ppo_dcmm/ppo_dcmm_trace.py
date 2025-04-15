@@ -59,8 +59,8 @@ class PPO_Trace(object):
             self.model.parameters(), self.init_lr, eps=1e-5)
         # ---- PPO Train Param ----
         self.e_clip = self.ppo_config['e_clip']
-        self.action_track_denorm = self.ppo_config['action_track_denorm']
-        self.action_catch_denorm = self.ppo_config['action_catch_denorm']
+        # self.action_track_denorm = self.ppo_config['action_track_denorm']
+        # self.action_catch_denorm = self.ppo_config['action_catch_denorm']
         self.action_trace_denorm = self.ppo_config['action_trace_denorm']
         self.clip_value = self.ppo_config['clip_value']
         self.entropy_coef = self.ppo_config['entropy_coef']
@@ -375,17 +375,17 @@ class PPO_Trace(object):
     def action2dict(self, actions):
         actions = actions.cpu().numpy()
         # De-normalize the actions
-        if self.env.call('task')[0] == 'Tracking':
-            base_tensor = actions[:, :2] * self.action_track_denorm[0]
-            arm_tensor = actions[:, 2:5] * self.action_track_denorm[1]
-            hand_tensor = actions[:, 5:] * self.action_track_denorm[2]
-        elif self.env.call('task')[0] == 'Tracing':
-            base_tensor = actions[:, :2] * self.action_trace_denorm[0]
-            arm_tensor = actions[:, 2:6] * self.action_trace_denorm[1]
-        else:
-            base_tensor = actions[:, :2] * self.action_catch_denorm[0]
-            arm_tensor = actions[:, 2:5] * self.action_catch_denorm[1]
-            hand_tensor = actions[:, 5:] * self.action_catch_denorm[2]
+        # if self.env.call('task')[0] == 'Tracking':
+        #     base_tensor = actions[:, :2] * self.action_track_denorm[0]
+        #     arm_tensor = actions[:, 2:5] * self.action_track_denorm[1]
+        #     hand_tensor = actions[:, 5:] * self.action_track_denorm[2]
+        # elif self.env.call('task')[0] == 'Tracing':
+        base_tensor = actions[:, :2] * self.action_trace_denorm[0]
+        arm_tensor = actions[:, 2:6] * self.action_trace_denorm[1]
+        # else:
+        #     base_tensor = actions[:, :2] * self.action_catch_denorm[0]
+        #     arm_tensor = actions[:, 2:5] * self.action_catch_denorm[1]
+        #     hand_tensor = actions[:, 5:] * self.action_catch_denorm[2]
 
         actions_dict = {
             'arm': arm_tensor,

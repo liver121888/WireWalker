@@ -30,12 +30,12 @@ wire_eval: False
 # used to set checkpoint path
 checkpoint_tracking: ''
 checkpoint_catching: ''
-checkpoint_tracing: 'outputs/WireWalker/2025-04-14/19:17:10/nn/best_reward_1348.68.pth'
+checkpoint_tracing: ''
 # checkpoint_tracking: 'assets/models/track.pth'
 # checkpoint_catching: 'assets/models/catch_two_stage.pth'
 
 # wandb config
-output_name: WireWalker
+output_name: WireWalker_low_act_limit
 wandb_mode: "online"  # "online" | "offline" | "disabled"
 wandb_entity: 'wirewalker'
 # wandb_project: 'RL_Dcmm_Track_Random'

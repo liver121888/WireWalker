@@ -62,7 +62,7 @@ reward_weights = {
         'base': -0.5,
         'arm': -0.2,
     },
-    "r_collision": -0.5,
+    "r_collision": -2,
     "r_progress": 100.0,
     "r_goal": 500.0,
     "r_time": -1e-1,
@@ -131,7 +131,7 @@ k_obs_object = 0.01
 k_obs_wire = 0.01
 # k_obs_hand = 0.01
 ## Actions Noise
-k_act = 0.025
+k_act = 0.005
 ## Action Delay
 act_delay = {
     'base': [1,],

@@ -242,11 +242,11 @@ class WireWalkerVecEnv(gym.Env):
             }
         )
         # Define the limit for the mobile base action
-        base_low = np.array([-4, -4])
-        base_high = np.array([4, 4])
+        base_low = np.array([-2, -2])
+        base_high = np.array([2, 2])
         # Define the limit for the arm action
-        arm_low = -0.025 * np.ones(4)
-        arm_high = 0.025 * np.ones(4)
+        arm_low = -0.015 * np.ones(4)
+        arm_high = 0.015 * np.ones(4)
 
         # Get initial ee_pos3d
         self.init_pos = True
