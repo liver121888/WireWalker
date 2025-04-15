@@ -23,14 +23,14 @@ task: Tracing # Catching_TwoStage, Catching_OneStage, Tracking
 # minibatch_size: 512
 # horizon_length: 64
 
-num_envs: 1 # This should be no more than 2x your CPUs (1x is recommended)
+num_envs: 8 # This should be no more than 2x your CPUs (1x is recommended)
 # num_envs: 8 # This should be no more than 2x your CPUs (1x is recommended)
 wire_eval: False
 
 # used to set checkpoint path
 checkpoint_tracking: ''
 checkpoint_catching: ''
-checkpoint_tracing: ''
+checkpoint_tracing: 'outputs/WireWalker/2025-04-14/19:17:10/nn/best_reward_1348.68.pth'
 # checkpoint_tracking: 'assets/models/track.pth'
 # checkpoint_catching: 'assets/models/catch_two_stage.pth'
 

@@ -43,7 +43,7 @@ ppo:
   # minibatch_size: 512
   # horizon_length: 64
 
-  horizon_length: 64
+  horizon_length: 512
   minibatch_size: 64
   mini_epochs: 6
   critic_coef: 4

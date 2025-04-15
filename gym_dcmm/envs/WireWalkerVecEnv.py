@@ -826,12 +826,10 @@ class WireWalkerVecEnv(gym.Env):
         reward_info["constraint"] = constraint_reward
         
         # 6. 控制惩罚 - 惩罚过大的控制输入
-        base_ctrl = np.linalg.norm(ctrl["base"])
-        arm_ctrl = np.linalg.norm(ctrl["arm"])
-        ctrl_penalty = base_ctrl * WireWalkerCfg.reward_weights["r_ctrl"]["base"] + \
-                        arm_ctrl * WireWalkerCfg.reward_weights["r_ctrl"]["arm"]
-        reward += ctrl_penalty
-        reward_info["ctrl"] = ctrl_penalty
+        reward_ctrl = self.norm_ctrl(ctrl, {"base", "arm"}) * WireWalkerCfg.reward_weights["r_ctrl"]["all"]
+        reward += reward_ctrl
+        
+        reward_info["ctrl"] = reward_ctrl
         
         # 7. 时间惩罚 - 鼓励快速完成
         time_penalty = WireWalkerCfg.reward_weights["r_time"]
@@ -848,7 +846,7 @@ class WireWalkerVecEnv(gym.Env):
             print(f"进度奖励: {progress_reward:.4f}")
             print(f"目标奖励: {goal_reward:.4f}")
             print(f"约束奖励: {constraint_reward:.4f}")
-            print(f"控制惩罚: {ctrl_penalty:.4f}")
+            print(f"控制惩罚: {reward_ctrl:.4f}")
             print(f"时间惩罚: {time_penalty:.4f}")
             print(f"总奖励: {reward:.4f}")
             print("====================\n")
