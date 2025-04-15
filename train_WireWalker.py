@@ -57,13 +57,13 @@ def main(config: DictConfig):
     env = gym.make_vec(env_name, num_envs=int(config.num_envs), 
                     task=task, camera_name=["top"],
                     render_per_step=False, render_mode = "rgb_array",
-                    wire_name = "straight",
+                    wire_name = config.wire_name,
                     img_size = config.train.ppo.img_dim,
                     imshow_cam = config.imshow_cam, 
                     viewer = config.viewer,
-                    print_obs = False, print_info = False,
-                    print_reward = False, print_ctrl = False,
-                    print_contacts = False, wire_eval = config.wire_eval,
+                    print_obs = config.print_obs, print_info = config.print_info,
+                    print_reward = config.print_reward, print_ctrl = config.print_ctrl,
+                    print_contacts = config.print_contacts, wire_eval = config.wire_eval,
                     env_time = 2.5, steps_per_policy = 20)
 
     output_dif = os.path.join('outputs', config.output_name)
