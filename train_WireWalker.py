@@ -54,6 +54,9 @@ def main(config: DictConfig):
     # else:
     task = 'Tracing'
     print("config.num_envs: ", config.num_envs)
+    print("config.domand_rand: ", config.domain_rand)
+    print("config.wire_name: ", config.wire_name)
+    print("config.wire_name_eval: ", config.wire_name_eval)
     env = gym.make_vec(env_name, num_envs=int(config.num_envs), 
                     task=task, camera_name=["top"],
                     render_per_step=False, render_mode = "rgb_array",
@@ -63,8 +66,10 @@ def main(config: DictConfig):
                     viewer = config.viewer,
                     print_obs = config.print_obs, print_info = config.print_info,
                     print_reward = config.print_reward, print_ctrl = config.print_ctrl,
-                    print_contacts = config.print_contacts, wire_eval = config.wire_eval,
-                    env_time = 2.5, steps_per_policy = 20)
+                    print_contacts = config.print_contacts, wire_name_eval = config.wire_name_eval,
+                    domain_rand = config.domain_rand,
+                    env_time = 2.5, steps_per_policy = 20,
+                    device=config.rl_device,)
 
     output_dif = os.path.join('outputs', config.output_name)
     # Get the local date and time

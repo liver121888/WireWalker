@@ -103,22 +103,23 @@ class WireWalkerVecEnv(gym.Env):
     def __init__(
         self,
         task="tracing",
-        render_mode="depth_array",
-        render_per_step=False,
-        viewer=False,
-        imshow_cam=False,
-        wire_eval=False,
         camera_name=["top", "wrist"],
+        render_per_step=False,
+        render_mode="depth_array",
         wire_name="straight",
-        env_time=2.5,
-        steps_per_policy=20,
         img_size=(480, 640),
-        device="cuda:0",
+        imshow_cam=False,
+        viewer=False,
         print_obs=False,
+        print_info=False,
         print_reward=False,
         print_ctrl=False,
-        print_info=False,
         print_contacts=False,
+        wire_name_eval="",
+        domain_rand=False,
+        env_time=2.5,
+        steps_per_policy=20,
+        device="cuda:0",
     ):
         if task not in ["Tracking", "Catching", "Tracing"]:
             raise ValueError("Invalid task: {}".format(task))
@@ -138,9 +139,16 @@ class WireWalkerVecEnv(gym.Env):
         self.print_ctrl = print_ctrl
         self.print_info = print_info
         self.print_contacts = print_contacts
+
+        self.wire_train = True
+        self.wire_name_eval = wire_name_eval
+        if self.wire_name_eval:
+            self.wire_train = False
+        self.domain_rand = domain_rand
+
         # Initialize the environment
         self.WireWalker = MJ_WireWalker(
-            viewer=viewer, wire_name=wire_name, wire_eval=wire_eval
+            viewer=viewer
         )
         # self.WireWalker.show_model_info()
         self.fps = 1 / (self.steps_per_policy * self.WireWalker.model.opt.timestep)
@@ -148,9 +156,6 @@ class WireWalkerVecEnv(gym.Env):
         self.random_mass = 0.25
         # self.object_static_time = 0.75
         # self.object_throw = False
-        self.wire_train = True
-        if wire_eval:
-            self.set_wire_eval()
 
         self.ee_link_name = "link_ee"
 
@@ -162,11 +167,9 @@ class WireWalkerVecEnv(gym.Env):
         self.floor_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "floor"
         )
-
         self.base_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "ranger_base"
         )
-
         # Get the body id of the wire
         self.wire_id = mujoco.mj_name2id(
             self.WireWalker.model, mujoco.mjtObj.mjOBJ_BODY, "wire_0"
@@ -303,23 +306,9 @@ class WireWalkerVecEnv(gym.Env):
         self.vel_init = False
         self.vel_history = deque(maxlen=4)
 
-        # Read the JSON file to get wire points
-        with open(os.path.join(WireWalkerCfg.ASSET_PATH, 'points', wire_name + '.json'), 'r') as file:
-            data = json.load(file)
-
         self.waypoint_pos = []
         self.waypoint_quat = []
-
-        _waypoints = data[self.wire_name]
-        for pt in _waypoints:
-            self.waypoint_pos.append([pt["x"], pt["y"], pt["z"]])
-            self.waypoint_quat.append([pt['qw'], pt['qx'], pt['qy'], pt['qz']])
-        
-        self.last_waypoint_idx = 0
-        self.waypoint_num = len(self.waypoint_pos)
-        print("Got", self.waypoint_num, "waypoints")
-        # print(self.waypoint_pos)
-
+        self._load_waypoints()
 
         # get the distance between the end effector and the waypoint in wire
         self.info = self._get_info()
@@ -350,8 +339,22 @@ class WireWalkerVecEnv(gym.Env):
         self.k_obs_object = WireWalkerCfg.k_obs_object
         self.k_act = WireWalkerCfg.k_act
 
-    def set_wire_eval(self):
-        self.wire_train = False
+    def _load_waypoints(self):
+        # Read the JSON file to get wire points
+        with open(os.path.join(WireWalkerCfg.ASSET_PATH, 'points', self.wire_name + '.json'), 'r') as file:
+            data = json.load(file)
+
+        self.waypoint_pos = []
+        self.waypoint_quat = []
+
+        _waypoints = data[self.wire_name]
+        for pt in _waypoints:
+            self.waypoint_pos.append([pt["x"], pt["y"], pt["z"]])
+            self.waypoint_quat.append([pt['qw'], pt['qx'], pt['qy'], pt['qz']])
+        
+        self.last_waypoint_idx = 0
+        self.waypoint_num = len(self.waypoint_pos)
+        print("Got", self.waypoint_num, "waypoints")
 
     def _get_contacts(self):
         # Contact information
@@ -609,52 +612,18 @@ class WireWalkerVecEnv(gym.Env):
             file_name = include_body.get("file")
             if file_name is not None:
                 # Update the file attribute with the new file path
+                # Modify the wire type
+
+                if self.domain_rand:
+                    wire_idx = np.random.choice([i for i in range(len(WireWalkerCfg.wire_names))])
+                    print("wire_idx: ", wire_idx)
+                    self.wire_name = WireWalkerCfg.wire_names[wire_idx]
+                elif not self.wire_train:
+                    self.wire_name = self.wire_name_eval
+                # else: 
+                    # train, use self.wire_name
+                
                 include_body.set("file", "assets/urdf/wires/wire_{}.xml".format(self.wire_name))
-
-
-        # if object_body is not None:
-        #     inertial = object_body.find("inertial")
-        #     if inertial is not None:
-        #         # Generate a random mass within the specified range
-        #         self.random_mass = np.random.uniform(
-        #             WireWalkerCfg.object_mass[0], WireWalkerCfg.object_mass[0]
-        #         )
-        #         # Update the mass attribute
-        #         inertial.set("mass", str(self.random_mass))
-        #     joint = object_body.find("joint")
-        #     if joint is not None:
-        #         # Generate a random damping within the specified range
-        #         random_damping = np.random.uniform(
-        #             WireWalkerCfg.object_damping[0], WireWalkerCfg.object_damping[1]
-        #         )
-        #         # Update the damping attribute
-        #         joint.set("damping", str(random_damping))
-        #     # Find the <geom> element
-        #     geom = object_body.find(".//geom[@name='object']")
-        #     if geom is not None:
-        #         # Modify the type and size attributes
-        #         object_id = np.random.choice([0, 1, 2, 3, 4])
-        #         if self.object_train:
-        #             object_shape = WireWalkerCfg.object_shape[object_id]
-        #             geom.set(
-        #                 "type", object_shape
-        #             )  # Replace "box" with the desired type
-        #             object_size = np.array(
-        #                 [
-        #                     np.random.uniform(low=low, high=high)
-        #                     for low, high in WireWalkerCfg.object_size[object_shape]
-        #                 ]
-        #             )
-        #             geom.set(
-        #                 "size", np.array_str(object_size)[1:-1]
-        #             )  # Replace with the desired size
-        #             # print("### Object Geom Info ###")
-        #             # for key, value in geom.attrib.items():
-        #             #     print(f"{key}: {value}")
-        #         else:
-        #             object_mesh = WireWalkerCfg.object_mesh[object_id]
-        #             geom.set("mesh", object_mesh)
-
 
         # Convert the XML element tree to a string
         xml_str = ET.tostring(root, encoding="unicode")
@@ -699,6 +668,32 @@ class WireWalkerVecEnv(gym.Env):
 
     def _reset_simulation(self):
         # Reset the data in Mujoco Simulation
+
+        # will set self.wire_name
+        # self.WireWalker.model_xml_string = self._reset_scene()
+        # self.WireWalker.model = mujoco.MjModel.from_xml_string(
+        #     self.WireWalker.model_xml_string
+        # )
+        # self.WireWalker.data = mujoco.MjData(self.WireWalker.model)
+        # self.floor_id = mujoco.mj_name2id(
+        #     self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "floor"
+        # )
+        # self.base_id = mujoco.mj_name2id(
+        #     self.WireWalker.model, mujoco.mjtObj.mjOBJ_GEOM, "ranger_base"
+        # )
+        # # Get the body id of the wire
+        # self.wire_id = mujoco.mj_name2id(
+        #     self.WireWalker.model, mujoco.mjtObj.mjOBJ_BODY, "wire_0"
+        # )
+        # first_geom_id = next(
+        #     geom_id
+        #     for geom_id in range(self.WireWalker.model.ngeom)
+        #     if self.WireWalker.model.geom_bodyid[geom_id] == self.wire_id
+        # )
+        # self.wire_group = self.WireWalker.model.geom_group[first_geom_id]
+
+        # self._load_waypoints()
+
         mujoco.mj_resetData(self.WireWalker.model, self.WireWalker.data)
         mujoco.mj_resetData(self.WireWalker.model_arm, self.WireWalker.data_arm)
         if self.WireWalker.model.na == 0:
@@ -855,187 +850,6 @@ class WireWalkerVecEnv(gym.Env):
         info["reward_info"] = reward_info
         
         return reward
-
-
-    # # TODO: modify the reward function
-    # def compute_reward_original(self, obs, info, ctrl):
-    #     """
-    #     Rewards:
-    #     - Object Position Reward
-    #     - Object Orientation Reward
-    #     - Object Touch Success Reward
-    #     - Object Catch Stability Reward
-    #     - Collision Penalty
-    #     - Constraint Penalty
-    #     """
-    #     rewards = 0.0
-    #     ## Object Position Reward (-inf, 0)
-    #     # Compute the closest distance the end-effector comes to the object
-    #     reward_base_pos = (
-    #         self.info["base_distance"] - info["base_distance"]
-    #     ) * WireWalkerCfg.reward_weights["r_base_pos"]
-    #     reward_ee_pos = (
-    #         self.info["ee_distance"] - info["ee_distance"]
-    #     ) * WireWalkerCfg.reward_weights["r_ee_pos"]
-    #     reward_ee_precision = (
-    #         math.exp(-50 * info["ee_distance"] ** 2)
-    #         * WireWalkerCfg.reward_weights["r_precision"]
-    #     )
-
-    #     ## Collision Penalty
-    #     # Compute the Penalty when the arm is collided with the mobile base
-    #     reward_collision = 0
-    #     if self.contacts["base_contacts"].size != 0:
-    #         reward_collision = WireWalkerCfg.reward_weights["r_collision"]
-
-    #     ## Constraint Penalty
-    #     # Compute the Penalty when the arm joint position is out of the joint limits
-    #     reward_constraint = 0 if self.arm_limit else -1
-    #     reward_constraint *= WireWalkerCfg.reward_weights["r_constraint"]
-
-    #     ## Object Touch Success Reward
-    #     # Compute the reward when the object is caught successfully by the hand
-    #     if self.step_touch:
-    #         # print("TRACK SUCCESS!!!!!")
-    #         if not self.reward_touch:
-    #             self.catch_time = self.WireWalker.data.time - self.start_time
-    #         self.reward_touch = WireWalkerCfg.reward_weights["r_touch"][self.task]
-    #     else:
-    #         self.reward_touch = 0
-
-    #     if self.task == "Tracing":
-    #         # TODO: modify the reward function
-    #         # can copy from tracking
-    #         pass
-    #     elif self.task == "Tracking":
-    #         ## Ctrl Penalty
-    #         # Compute the norm of base and arm movement through the current actions in the grasping stage
-    #         reward_ctrl = -self.norm_ctrl(ctrl, {"base", "arm"})
-    #         ## Object Orientation Reward
-    #         # Compute the dot product of the velocity vector of the object and the z axis of the end_effector
-    #         rotation_matrix = quaternion_to_rotation_matrix(obs["arm"]["ee_quat"])
-    #         local_velocity_vector = np.dot(rotation_matrix.T, obs["object"]["v_lin_3d"])
-    #         hand_z_axis = np.array([0, 0, 1])
-    #         reward_orient = (
-    #             abs(cos_angle_between_vectors(local_velocity_vector, hand_z_axis))
-    #             * WireWalkerCfg.reward_weights["r_orient"]
-    #         )
-    #         ## Add up the rewards
-    #         rewards = (
-    #             reward_base_pos
-    #             + reward_ee_pos
-    #             + reward_ee_precision
-    #             + reward_orient
-    #             + reward_ctrl
-    #             + reward_collision
-    #             + reward_constraint
-    #             + self.reward_touch
-    #         )
-    #         if self.print_reward:
-    #             if reward_constraint < 0:
-    #                 print("ctrl: ", ctrl)
-    #             print("### print reward")
-    #             print(
-    #                 "reward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, reward_ctrl: {:.3f}, \n".format(
-    #                     reward_ee_pos, reward_ee_precision, reward_orient, reward_ctrl
-    #                 )
-    #                 + "reward_collision: {:.3f}, reward_constraint: {:.3f}, reward_touch: {:.3f}".format(
-    #                     reward_collision, reward_constraint, self.reward_touch
-    #                 )
-    #             )
-    #             print("total reward: {:.3f}\n".format(rewards))
-    #     elif self.task == "Catching":
-    #         reward_orient = 0
-    #         ## Calculate the total reward in different stages
-    #         if self.stage == "tracking":
-    #             ## Ctrl Penalty
-    #             # Compute the norm of hand joint movement through the current actions in the tracking stage
-    #             reward_ctrl = -self.norm_ctrl(ctrl, {"hand"})
-    #             ## Object Orientation Reward
-    #             # Compute the dot product of the velocity vector of the object and the z axis of the end_effector
-    #             rotation_matrix = quaternion_to_rotation_matrix(obs["arm"]["ee_quat"])
-    #             local_velocity_vector = np.dot(
-    #                 rotation_matrix.T, obs["object"]["v_lin_3d"]
-    #             )
-    #             hand_z_axis = np.array([0, 0, 1])
-    #             reward_orient = (
-    #                 abs(cos_angle_between_vectors(local_velocity_vector, hand_z_axis))
-    #                 * WireWalkerCfg.reward_weights["r_orient"]
-    #             )
-    #             ## Add up the rewards
-    #             rewards = (
-    #                 reward_base_pos
-    #                 + reward_ee_pos
-    #                 + reward_orient
-    #                 + reward_ctrl
-    #                 + reward_collision
-    #                 + reward_constraint
-    #                 + self.reward_touch
-    #             )
-    #             if self.print_reward:
-    #                 if reward_constraint < 0:
-    #                     print("ctrl: ", ctrl)
-    #                 print("### print reward")
-    #                 print(
-    #                     "reward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, reward_ctrl: {:.3f}, \n".format(
-    #                         reward_ee_pos,
-    #                         reward_ee_precision,
-    #                         reward_orient,
-    #                         reward_ctrl,
-    #                     )
-    #                     + "reward_collision: {:.3f}, reward_constraint: {:.3f}, reward_touch: {:.3f}".format(
-    #                         reward_collision, reward_constraint, self.reward_touch
-    #                     )
-    #                 )
-    #                 print("total reward: {:.3f}\n".format(rewards))
-    #         else:
-    #             ## Ctrl Penalty
-    #             # Compute the norm of base and arm movement through the current actions in the grasping stage
-    #             reward_ctrl = -self.norm_ctrl(ctrl, {"base", "arm"})
-    #             ## Set the Orientation Reward to maximum (1)
-    #             reward_orient = 1
-    #             ## Object Touch Stability Reward
-    #             # Compute the reward when the object is caught stably in the hand
-    #             if self.reward_touch:
-    #                 self.reward_stability = (
-    #                     info["env_time"] - self.catch_time
-    #                 ) * WireWalkerCfg.reward_weights["r_stability"]
-    #             else:
-    #                 self.reward_stability = 0.0
-    #             ## Add up the rewards
-    #             rewards = (
-    #                 reward_base_pos
-    #                 + reward_ee_pos
-    #                 + reward_ee_precision
-    #                 + reward_orient
-    #                 + reward_ctrl
-    #                 + reward_collision
-    #                 + reward_constraint
-    #                 + self.reward_touch
-    #                 + self.reward_stability
-    #             )
-    #             if self.print_reward:
-    #                 print("##### print reward")
-    #                 print(
-    #                     "reward_touch: {}, \nreward_ee_pos: {:.3f}, reward_ee_precision: {:.3f}, reward_orient: {:.3f}, \n".format(
-    #                         self.reward_touch,
-    #                         reward_ee_pos,
-    #                         reward_ee_precision,
-    #                         reward_orient,
-    #                     )
-    #                     + "reward_stability: {:.3f}, reward_collision: {:.3f}, \nreward_ctrl: {:.3f}, reward_constraint: {:.3f}".format(
-    #                         self.reward_stability,
-    #                         reward_collision,
-    #                         reward_ctrl,
-    #                         reward_constraint,
-    #                     )
-    #                 )
-    #                 print("total reward: {:.3f}\n".format(rewards))
-
-    #     else:
-    #         raise ValueError("Invalid task: {}".format(self.task))
-
-    #     return rewards
 
     def _step_mujoco_simulation(self, action_dict):
 
