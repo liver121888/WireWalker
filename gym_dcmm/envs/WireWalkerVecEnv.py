@@ -116,7 +116,6 @@ class WireWalkerVecEnv(gym.Env):
         print_ctrl=False,
         print_contacts=False,
         wire_name_eval="",
-        domain_rand=False,
         env_time=2.5,
         steps_per_policy=20,
         device="cuda:0",
@@ -141,10 +140,9 @@ class WireWalkerVecEnv(gym.Env):
         self.print_contacts = print_contacts
 
         self.wire_train = True
-        self.wire_name_eval = wire_name_eval
-        if self.wire_name_eval:
+        if wire_name_eval:
             self.wire_train = False
-        self.domain_rand = domain_rand
+            self.wire_name = wire_name_eval
 
         # Initialize the environment
         self.WireWalker = MJ_WireWalker(
@@ -613,15 +611,6 @@ class WireWalkerVecEnv(gym.Env):
             if file_name is not None:
                 # Update the file attribute with the new file path
                 # Modify the wire type
-
-                if self.domain_rand:
-                    wire_idx = np.random.choice([i for i in range(len(WireWalkerCfg.wire_names))])
-                    print("wire_idx: ", wire_idx)
-                    self.wire_name = WireWalkerCfg.wire_names[wire_idx]
-                elif not self.wire_train:
-                    self.wire_name = self.wire_name_eval
-                # else: 
-                    # train, use self.wire_name
                 
                 include_body.set("file", "assets/urdf/wires/wire_{}.xml".format(self.wire_name))
 
