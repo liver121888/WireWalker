@@ -124,7 +124,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # we acturally gen sample_num + 1 points
     parser.add_argument("--name", type=str, default='sine', help="Name of the wire")
-    parser.add_argument("--sample_num", type=float, default=10, help="Number of samples along the X")
+    parser.add_argument("--sample_num", type=int, default=10, help="Number of samples along the X")
     parser.add_argument("--precision", type=float, default=1e-3, help="Precision for coordinate rounding")
     # must be float
     parser.add_argument('--start_point', type=float, nargs=7, 
