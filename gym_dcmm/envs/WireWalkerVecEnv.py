@@ -1106,7 +1106,7 @@ class WireWalkerVecEnv(gym.Env):
             # print("self.WireWalker.data.body('link6'):", self.WireWalker.data.body('link6'))
             observation, reward, terminated, truncated, info = self.step(actions_dict)
             total_reward += reward
-            print("ee dist", info["ee_distance"])
+            # print("ee dist", info["ee_distance"])
             # print(f"当前奖励: {reward:.4f}")
             # print(f"累计奖励: {total_reward:.4f}")
 
@@ -1146,19 +1146,15 @@ if __name__ == "__main__":
         task=args.task,
         # TODO: modify to a list of body
         wire_name=args.wire_name,
-        render_per_step=False,
-        print_reward=args.print_reward,
-        print_info=args.print_info,
-        print_contacts=args.print_contacts,
-        print_ctrl=args.print_ctrl,
-        print_obs=args.print_obs,
-        camera_name=["top"],
-        render_mode="rgb_array",
         imshow_cam=args.imshow_cam,
         viewer=args.viewer,
-        wire_eval=False,
+        print_obs=args.print_obs, print_info=args.print_info,
+        print_reward=args.print_reward, print_ctrl=args.print_ctrl,
+        print_contacts=args.print_contacts, wire_name_eval='',
+        render_per_step=False,
+        camera_name=["top"],
+        render_mode="rgb_array",
         # last 5 minutes
-        env_time=300,
-        steps_per_policy=20,
+        env_time=300, steps_per_policy=20,
     )
     env.run_test()
