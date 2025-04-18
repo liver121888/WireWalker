@@ -10,7 +10,7 @@ ASSET_PATH = os.path.join(root, "../../assets")
 XML_WIREWALKER_WIRE_PATH = "urdf/x1_xarm6_stick_wire.xml"
 XML_ARM_PATH = "urdf/xarm6_right.xml"
 
-WAYPOINT_DIST_EPSILON = 5e-2 # L2 distance to waypoint to say we 'reached' a waypoint
+WAYPOINT_DIST_EPSILON = 1e-2 # L2 distance to waypoint to say we 'reached' a waypoint
 ## Weight Saved Path
 WEIGHT_PATH = os.path.join(ASSET_PATH, "weights")
 

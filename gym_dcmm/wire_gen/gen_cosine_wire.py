@@ -122,7 +122,7 @@ if __name__ == "__main__":
     parser.add_argument("--sample_num", type=int, default=10, help="Number of samples along the X")
     # must be float
     parser.add_argument('--start_point', type=float, nargs=7, 
-                        default=[-0.02, 0.48, 0.40, 1.0, 0.0, 0.0, 0.0], 
+                        default=[-0.02, 0.48, 0.45, 1.0, 0.0, 0.0, 0.0], 
                         help="Starting point of the wire: x y z qw qx qy qz")
     parser.add_argument('--wire_num', type=int, default=1, help="Number of wires to generate")
     args = parser.parse_args()

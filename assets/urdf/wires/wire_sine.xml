@@ -1,54 +1,28 @@
 <mujoco model="wire_sine">
   <body name="wire_0">
-    <geom type="mesh" mesh="sine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom name="wire_0" type="mesh" mesh="sine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_17" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_18" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_19" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_20" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_21" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0"/>
-  </body>
-
-  <body name="wire_1">
-    <geom type="mesh" mesh="sine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom name="wire_1" type="mesh" mesh="sine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_17" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_18" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_19" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_20" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
-    <geom type="mesh" mesh="sine_collision_21" group="2" rgba="0.0 0.8 0.0 1" pos="0.15771531752633466 0.48 0.5777153175263346" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom name="wire_0" type="mesh" mesh="sine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_17" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_18" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_19" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_20" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="sine_collision_21" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
   </body>
 
 </mujoco>
