@@ -1,9 +1,9 @@
 <mujoco model="wire_straight">
-    <body name="wire_0" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+    <body name="wire_0" pos="-0.02 0.48 0.4" quat="1.0 0.0 0.0 0.0">
         <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight" />
         <geom name="wire_0" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight" />
     </body>
-    <body name="wire_1" pos="0.08 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+    <body name="wire_1" pos="0.08 0.48 0.4" quat="1.0 0.0 0.0 0.0">
         <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight" />
         <geom name="wire_1" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight" />
     </body>

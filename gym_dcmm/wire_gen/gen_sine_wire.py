@@ -2,7 +2,35 @@ import argparse
 import numpy as np
 import math
 from scipy.spatial.transform import Rotation as R
-from wire_gen_utils import round_precision, save_points, save_xml
+from wire_gen_utils import save_points, save_xml
+
+body_string="""
+  <body name="wire_{idx}">
+    <geom type="mesh" mesh="sine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="{p}" quat="{q}"/>
+    <geom name="wire_{idx}" type="mesh" mesh="sine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_17" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_18" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_19" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_20" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="sine_collision_21" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+  </body>
+"""
 
 def sample_points(args):
     """
@@ -99,23 +127,18 @@ def gen_xml(start_point, args):
     dict_key = args.name
 
     xml_string = """<mujoco model="wire_{}">""".format(dict_key)
-
-    straight_wire_string = """
-    <body name="wire_{}" pos="{}" quat="{}">
-        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="{}" />
-        <geom name="wire_{}" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="{}" />
-    </body>"""
+    # xml_string += asset_string.format(name=dict_key)
 
     for i in range(wire_num):
-        xml_string += straight_wire_string.format(i,
-            " ".join(map(str,(start_point[dict_key][i]['x'], 
+        xml_string += body_string.format(idx=i,
+            p=" ".join(map(str,(start_point[dict_key][i]['x'], 
                      start_point[dict_key][i]['y'], 
                      start_point[dict_key][i]['z']))),
-            " ".join(map(str,(start_point[dict_key][i]['qw'],
+            q=" ".join(map(str,(start_point[dict_key][i]['qw'],
                                 start_point[dict_key][i]['qx'],
                                 start_point[dict_key][i]['qy'],
-                                start_point[dict_key][i]['qz']))),
-            dict_key, i, dict_key)
+                                start_point[dict_key][i]['qz'])))
+            )
 
     xml_string += """\n</mujoco>"""
     return xml_string
@@ -128,7 +151,7 @@ if __name__ == "__main__":
     parser.add_argument("--precision", type=float, default=1e-3, help="Precision for coordinate rounding")
     # must be float
     parser.add_argument('--start_point', type=float, nargs=7, 
-                        default=[-0.02, 0.48, 0.45, 1.0, 0.0, 0.0, 0.0], 
+                        default=[-0.02, 0.48, 0.40, 1.0, 0.0, 0.0, 0.0], 
                         help="Starting point of the wire: x y z qw qx qy qz")
     parser.add_argument('--wire_num', type=int, default=1, help="Number of wires to generate")
     args = parser.parse_args()

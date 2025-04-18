@@ -4,6 +4,30 @@ import math
 from scipy.spatial.transform import Rotation as R
 from wire_gen_utils import save_points, save_xml
 
+body_string="""
+  <body name="wire_{idx}">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="{p}" quat="{q}"/>
+    <geom name="wire_{idx}" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="{p}" quat="{q}"/>
+  </body>
+"""
+
+
 def sample_points(args):
     """
     Sample points for a cosine wire.
@@ -77,22 +101,16 @@ def gen_xml(start_point, args):
 
     xml_string = """<mujoco model="wire_{}">""".format(dict_key)
 
-    straight_wire_string = """
-    <body name="wire_{}" pos="{}" quat="{}">
-        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="{}" />
-        <geom name="wire_{}" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="{}" />
-    </body>"""
-
     for i in range(wire_num):
-        xml_string += straight_wire_string.format(i,
-            " ".join(map(str,(start_point[dict_key][i]['x'], 
+        xml_string += body_string.format(idx=i,
+            p=" ".join(map(str,(start_point[dict_key][i]['x'], 
                      start_point[dict_key][i]['y'], 
                      start_point[dict_key][i]['z']))),
-            " ".join(map(str,(start_point[dict_key][i]['qw'],
+            q=" ".join(map(str,(start_point[dict_key][i]['qw'],
                                 start_point[dict_key][i]['qx'],
                                 start_point[dict_key][i]['qy'],
-                                start_point[dict_key][i]['qz']))),
-            dict_key, i, dict_key)
+                                start_point[dict_key][i]['qz'])))
+            )
 
     xml_string += """\n</mujoco>"""
     return xml_string
@@ -101,10 +119,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # we acturally gen sample_num + 1 points
     parser.add_argument("--name", type=str, default='cosine', help="Name of the wire")
-    parser.add_argument("--sample_num", type=float, default=10, help="Number of samples along the X")
+    parser.add_argument("--sample_num", type=int, default=10, help="Number of samples along the X")
     # must be float
     parser.add_argument('--start_point', type=float, nargs=7, 
-                        default=[-0.02, 0.48, 0.45, 1.0, 0.0, 0.0, 0.0], 
+                        default=[-0.02, 0.48, 0.40, 1.0, 0.0, 0.0, 0.0], 
                         help="Starting point of the wire: x y z qw qx qy qz")
     parser.add_argument('--wire_num', type=int, default=1, help="Number of wires to generate")
     args = parser.parse_args()
