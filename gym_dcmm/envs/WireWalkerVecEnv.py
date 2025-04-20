@@ -839,7 +839,7 @@ class WireWalkerVecEnv(gym.Env):
             print("\n===== 奖励详情 =====")
             print(f"距离: {ee_distance:.4f}m")
             # print(f"中心距离奖励: {center_dist_reward:.4f}")
-            print(f"姿态奖励: {reward_orient:.4f}")
+            # print(f"姿态奖励: {reward_orient:.4f}")
             print(f"精确度奖励: {precision_reward:.4f}")
             print(f"碰撞惩罚: {collision_reward:.4f}")
             print(f"进度奖励: {progress_reward:.4f}")
