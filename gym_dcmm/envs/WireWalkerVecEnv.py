@@ -769,6 +769,13 @@ class WireWalkerVecEnv(gym.Env):
         )
         return np.linalg.norm(ctrl_array)
 
+    # def quat_angle_loss(self, q1, q2):
+    #     q1 = np.array(q1)
+    #     q2 = np.array(q2)
+    #     dot = np.clip(np.abs(np.dot(q1, q2)), 0.0, 1.0)
+    #     angle = 2 * np.arccos(np.abs(dot))
+    #     return angle  # this is in radians
+
     def compute_reward(self, obs, info, ctrl):
         # 初始化奖励和奖励信息字典
         reward = 0.0
@@ -779,6 +786,13 @@ class WireWalkerVecEnv(gym.Env):
         # center_dist_reward = ee_distance * WireWalkerCfg.reward_weights["r_center_dist"]
         # reward += center_dist_reward
         # reward_info["center_dist"] = center_dist_reward
+
+        # 1.5. 姿態奖励
+        # reward_orient = 0.0
+        # if info["ee_distance"] < WireWalkerCfg.WAYPOINT_DIST_EPSILON:  # or any small threshold
+        #     quat_loss = self.quat_angle_loss(obs["arm"]["ee_quat"], obs["wire"]["quat"])
+        #     reward_orient = quat_loss * WireWalkerCfg.reward_weights["r_orient"]
+        # reward_info["orient"] = reward_orient
         
         # 2. 精确度奖励 - 接近理想距离
         precision_reward_factor = min(1, np.exp(-50 * (ee_distance)**2))
@@ -825,6 +839,7 @@ class WireWalkerVecEnv(gym.Env):
             print("\n===== 奖励详情 =====")
             print(f"距离: {ee_distance:.4f}m")
             # print(f"中心距离奖励: {center_dist_reward:.4f}")
+            print(f"姿态奖励: {reward_orient:.4f}")
             print(f"精确度奖励: {precision_reward:.4f}")
             print(f"碰撞惩罚: {collision_reward:.4f}")
             print(f"进度奖励: {progress_reward:.4f}")

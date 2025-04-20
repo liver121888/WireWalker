@@ -10,14 +10,14 @@ ASSET_PATH = os.path.join(root, "../../assets")
 XML_WIREWALKER_WIRE_PATH = "urdf/x1_xarm6_stick_wire.xml"
 XML_ARM_PATH = "urdf/xarm6_right.xml"
 
-WAYPOINT_DIST_EPSILON = 1e-2 # L2 distance to waypoint to say we 'reached' a waypoint
+WAYPOINT_DIST_EPSILON = 3e-2 # L2 distance to waypoint to say we 'reached' a waypoint
 ## Weight Saved Path
 WEIGHT_PATH = os.path.join(ASSET_PATH, "weights")
 
 ## The distance threshold to change the stage from 'tracking' to 'grasping'
 # distance_thresh = 0.25
 
-wire_names = ["straight", "sine"]
+wire_names = ["straight", "cosine"]
 
 ## Define the initial joint positions of the arm and the hand
 arm_joints = np.array([
@@ -55,12 +55,13 @@ arm_joints = np.array([
 reward_weights = {
     "r_precision": 3.0,
     "r_constraint": -1.0,
+    # "r_orient": -1.0,
     "r_ctrl": {
         'all': -1.0,
         'base': -0.5,
         'arm': -0.2,
     },
-    "r_collision": -2,
+    "r_collision": -5.0,
     "r_progress": 100.0,
     "r_goal": 500.0,
     "r_time": -1e-1,
