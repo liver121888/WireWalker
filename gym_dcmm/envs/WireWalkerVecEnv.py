@@ -190,11 +190,17 @@ class WireWalkerVecEnv(gym.Env):
             if self.WireWalker.viewer:
                 print("Close the previous viewer")
                 self.WireWalker.viewer.close()
+            # Launch passive disables pausing, etc., from the UI.
+            # To test with the joints and pause/unpause from UI, comment out launch_passive lines and uncomment launch lines.
             self.WireWalker.viewer = mujoco.viewer.launch_passive(
                 self.WireWalker.model,
                 self.WireWalker.data,
                 key_callback=env_key_callback,
             )
+            # self.WireWalker.viewer = mujoco.viewer.launch(
+            #     self.WireWalker.model,
+            #     self.WireWalker.data,
+            # )
             # Modify the view position and orientation
             self.WireWalker.viewer.cam.lookat[0:2] = [0, 1]
             self.WireWalker.viewer.cam.distance = 5.0
@@ -858,7 +864,7 @@ class WireWalkerVecEnv(gym.Env):
     def _step_mujoco_simulation(self, action_dict):
 
         ## TODO: Low-Pass-Filter the Base Velocity
-        self.WireWalker.target_base_vel[0:2] = action_dict["base"]
+        self.WireWalker.target_base_vel[0:2] = np.zeros(2) #action_dict["base"]
         action_arm = np.concatenate((action_dict["arm"], np.zeros(2)))
         result_QP, _ = self.WireWalker.move_ee_pose(action_arm)
         if result_QP[1]:

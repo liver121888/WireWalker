@@ -240,7 +240,7 @@
                         <geom type="mesh" mesh="link3" />
                         <body name="link4" pos="0.0775 0.3425 0" quat="0.707105 -0.707108 0 0">
                             <inertial pos="-0.00021 0.02578 -0.02538" quat="0.994019 0.0752563 -0.00686804 0.0788347" mass="1.115" diaginertia="0.00440091 0.00406855 0.00103407" />
-                            <joint name="joint4" pos="0 0 0" axis="0 0 1" limited="true" range="1.80 4.141" damping="1" frictionloss="1" />
+                            <joint name="joint4" pos="0 0 0" axis="0 0 1" limited="true" range="1 6" damping="1" frictionloss="1" />
                             <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="link4" />
                             <geom type="mesh" mesh="link4" />
                             <body name="link5" pos="0 0 0" quat="0.707105 0.707108 0 0">
@@ -251,7 +251,7 @@
                                 <body name="link6" pos="0.076 0.097 0" quat="0.707105 -0.707108 0 0">
                                     <camera name="wrist" mode="fixed" pos="0.0 -0.068 0.0175" quat="0.0 1.0 0.0 0.0" fovy="43"/>
                                     <inertial pos="0.00464754 0.0302493 0.031817" quat="0.69781 -0.354303 0.155913 0.602678" mass="0.61428" diaginertia="0.00108383 0.000910552 0.000410862" />
-                                    <joint name="joint6" pos="0 0 0" axis="0 0 1" limited="true" range="-2.35 -0.785" damping="1" frictionloss="1" />
+                                    <joint name="joint6" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14 3.14" damping="1" frictionloss="1" />
                                     <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="link6" />
                                     <geom type="mesh" mesh="link6" />
                                     <geom pos="0.0375 0.0375 0.0" axisangle="1 -1 -1 2.1" type="mesh" contype="0" conaffinity="0" group="1" mesh="p1_Link" />

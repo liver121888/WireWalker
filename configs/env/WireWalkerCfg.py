@@ -17,7 +17,7 @@ WEIGHT_PATH = os.path.join(ASSET_PATH, "weights")
 ## The distance threshold to change the stage from 'tracking' to 'grasping'
 # distance_thresh = 0.25
 
-wire_names = ["straight", "cosine"]
+wire_names = ["sine"]
 
 ## Define the initial joint positions of the arm and the hand
 arm_joints = np.array([
