@@ -57,7 +57,7 @@
         <mesh file="hand_link_ee/hand_link_ee_collision_6.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_7.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_8.obj"/>
-        <mesh file="hand_link_ee/hand_link_ee_collision_9.obj"/>
+        <!-- <mesh file="hand_link_ee/hand_link_ee_collision_9.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_10.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_11.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_12.obj"/>
@@ -78,7 +78,7 @@
         <mesh file="hand_link_ee/hand_link_ee_collision_27.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_28.obj"/>
         <mesh file="hand_link_ee/hand_link_ee_collision_29.obj"/>
-        <mesh file="hand_link_ee/hand_link_ee_collision_30.obj"/>
+        <mesh file="hand_link_ee/hand_link_ee_collision_30.obj"/> -->
 
         <!-- Wire Related -->
         <mesh name="straight" file="straight.STL" />
@@ -261,21 +261,29 @@
                                     <geom pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" type="mesh" rgba="0.8 0.0 0.0 1" mesh="ee_link" /> -->
 
                                     <!-- hand_link_ee -->
+
+                                    <!-- legacy -->
                                     <!-- origin is in the half -->
                                     <!-- thickness = 0.01, p1_link thickness = 0.003 -->
                                     <!-- result z: 0.005 + 0.003 = 0.008-->
-                                    <geom pos="0.0 0.0 0.008" quat="-0.7071 0.7071 0 0" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.8 0.0 0.0 1" mesh="hand_link_ee"/>
+                                    <!-- legacy -->
+
+                                    <!-- origin is in the bottom -->
+                                    <!-- p1_link thickness = 0.003 -->
+                                    <!-- result z: 0.003 -->
+
+                                    <geom pos="0.0 0.0 0.003" quat="0.7071 0.7071 0 0" type="mesh" contype="0" conaffinity="0" group="1" rgba="0.8 0.0 0.0 1" mesh="hand_link_ee"/>
                                     
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_0"  rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_1"  rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_2"  rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_3"  rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_4"  rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_5"  rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_6"  rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_7"  rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_8"  rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_9"  rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.003" quat="0.7071 0.7071 0 0" mesh="hand_link_ee_collision_0"  rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.003" quat="0.7071 0.7071 0 0" mesh="hand_link_ee_collision_1"  rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.003" quat="0.7071 0.7071 0 0" mesh="hand_link_ee_collision_2"  rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.003" quat="0.7071 0.7071 0 0" mesh="hand_link_ee_collision_3"  rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.003" quat="0.7071 0.7071 0 0" mesh="hand_link_ee_collision_4"  rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.003" quat="0.7071 0.7071 0 0" mesh="hand_link_ee_collision_5"  rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.003" quat="0.7071 0.7071 0 0" mesh="hand_link_ee_collision_6"  rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.003" quat="0.7071 0.7071 0 0" mesh="hand_link_ee_collision_7"  rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.003" quat="0.7071 0.7071 0 0" mesh="hand_link_ee_collision_8"  rgba="0.8 0.0 0.0 1.0" />
+                                    <!-- <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_9"  rgba="0.8 0.0 0.0 1.0" />
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_10" rgba="0.8 0.0 0.0 1.0" />
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_11" rgba="0.8 0.0 0.0 1.0" />
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_12" rgba="0.8 0.0 0.0 1.0" />
@@ -296,14 +304,20 @@
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_27" rgba="0.8 0.0 0.0 1.0" />
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_28" rgba="0.8 0.0 0.0 1.0" />
                                     <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_29" rgba="0.8 0.0 0.0 1.0" />
-                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_30" rgba="0.8 0.0 0.0 1.0" />
+                                    <geom type="mesh" pos="0 0.0 0.007" quat="-0.7071 0.7071 0 0" mesh="hand_link_ee_collision_30" rgba="0.8 0.0 0.0 1.0" /> -->
                                     
                                     <!-- end hand_link_ee -->
 
                                     <!-- define a new body/link as ee frame -->
+
+                                    <!-- legacy -->
                                     <!-- thickness of hand_link_ee = 0.01, hoop stick out 0.21, thickness of p1_link = 0.003-->
                                     <!-- 0.003 + 0.01/2 = 0.008 -->
-                                    <body name="link_ee" pos="0.0 0.21 0.008" euler="0 1.57079 0">
+                                    <!-- legacy -->
+
+                                    <!-- 0.003 + 0.18 = 0.183 -->
+
+                                    <body name="link_ee" pos="0.0 0.0 0.183" euler="0 1.57079 0">
                                         <geom type="cylinder" size="0.005 0.03" contype="0" conaffinity="0" group="1" />
                                     </body>
                                 </body>
@@ -345,5 +359,5 @@
         <motor name="arm_actuator_4" joint="joint4" ctrlrange="-100 100" />
         <motor name="arm_actuator_5" joint="joint5" ctrlrange="-100 100" />
         <motor name="arm_actuator_6" joint="joint6" ctrlrange="-100 100" />
-\    </actuator>
+    </actuator>
 </mujoco>
