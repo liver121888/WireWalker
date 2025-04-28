@@ -948,7 +948,7 @@ class WireWalkerVecEnv(gym.Env):
             ):
                 self.terminated = True
         elif self.task == "Tracing":
-            if self.last_waypoint_idx == self.waypoint_num:
+            if self.last_waypoint_idx >= self.waypoint_num - 1:
                 print("### Tracing Success!!!")
                 self.terminated = True
 
@@ -1099,6 +1099,8 @@ class WireWalkerVecEnv(gym.Env):
         # action = np.zeros(18)
         action = np.zeros(6)
         total_reward = 0.0
+        # count = 0
+        # dir = 1
         while True:
             # Note: action's dim = 18, which includes 2 for the base, 4 for the arm, and 12 for the hand
             # Keyboard control
@@ -1118,6 +1120,10 @@ class WireWalkerVecEnv(gym.Env):
             #     action[6:18] = np.zeros(12)
             base_tensor = action[:2]
             arm_tensor = action[2:6]
+            # count += 1
+            # if count % 100 == 0:
+            #     dir *= -1
+            # arm_tensor[-1] = dir * 0.03
             # hand_tensor = action[6:18]
             actions_dict = {
                 "arm": arm_tensor,

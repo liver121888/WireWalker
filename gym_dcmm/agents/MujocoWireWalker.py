@@ -268,7 +268,7 @@ class MJ_WireWalker(object):
         # target_quat = (r_delta * r_current).as_quat()
         # target_quat = self.current_ee_quat
         result_QP = self.ik_arm_solve(target_pos, target_quat)
-        print("result_QP: ", result_QP)
+        # print("result_QP: ", result_QP)
         # Update the qpos of the arm with the IK solution
         self.data_arm.qpos[0:6] = result_QP[0]
         self.data_arm.qpos[5] = max(-3.1, min(3.1, current_joint6_pos + delta_pose[3]))
