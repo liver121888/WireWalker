@@ -21,7 +21,7 @@ wire_names = ["sine"]
 
 ## Define the initial joint positions of the arm and the hand
 arm_joints = np.array([
-   0.0, 0.0, -0.0, 3.07, 2.25, -1.5 
+   0.0, 0.56, -0.467, 3.07, 1.70, -1.57 
 ])
 
 # hand_joints = np.array([
