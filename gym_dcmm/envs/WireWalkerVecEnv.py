@@ -864,7 +864,8 @@ class WireWalkerVecEnv(gym.Env):
     def _step_mujoco_simulation(self, action_dict):
 
         ## TODO: Low-Pass-Filter the Base Velocity
-        self.WireWalker.target_base_vel[0:2] = np.zeros(2) #action_dict["base"]
+        # self.WireWalker.target_base_vel[0:2] = action_dict["base"]
+        self.WireWalker.target_base_vel[0:2] = np.zeros(2)
         action_arm = np.concatenate((action_dict["arm"], np.zeros(2)))
         result_QP, _ = self.WireWalker.move_ee_pose(action_arm)
         if result_QP[1]:
@@ -1111,6 +1112,9 @@ class WireWalkerVecEnv(gym.Env):
                 trigger_delta = False
             else:
                 action[2:6] = np.zeros(4)
+
+            # action[-1] = 0.01
+            # print("action: ", action)
 
             # if trigger_delta_hand:
             #     print("delta_xyz_hand: ", delta_xyz_hand)

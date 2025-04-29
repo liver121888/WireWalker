@@ -35,13 +35,8 @@ print_contacts: False
 # used to set checkpoint path
 checkpoint_tracking: ''
 checkpoint_catching: ''
-checkpoint_tracing: 'outputs/WireWalker_apr28/2025-04-28/15:23:59/nn/best_reward_2961.28.pth'
-# checkpoint_tracing: ''
-# checkpoint_tracing: 'assets/models/best_reward_3880.76.pth'
-# checkpoint_tracing: 'assets/models/best_reward_4300.32.pth'
-# checkpoint_tracing: 'assets/models/best_reward_2893.23.pth'
-# checkpoint_tracing: 'assets/models/best_reward_1418.08.pth'
-# checkpoint_tracing: 'assets/models/best_reward_5730.97.pth'
+checkpoint_tracing: ''
+checkpoint_tracing: 'assets/models/best_reward_158.07.pth'
 # checkpoint_tracking: 'assets/models/track.pth'
 # checkpoint_catching: 'assets/models/catch_two_stage.pth'
 
@@ -57,7 +52,7 @@ checkpoint_tracing: 'outputs/WireWalker_apr28/2025-04-28/15:23:59/nn/best_reward
 imshow_cam: False
 
 # wandb config
-output_name: WireWalker_apr28
+output_name: WireWalker_0428_new_ee_fixed_base
 wandb_mode: "online"  # "online" | "offline" | "disabled"
 wandb_entity: 'wirewalker'
 # wandb_project: 'RL_Dcmm_Track_Random'
