@@ -24,14 +24,15 @@ class PPO_Trace(object):
         # ---- build environment ----
         self.env = env
         self.num_actors = int(self.ppo_config['num_actors'])
+        print("===== Initializing PPO_Trace =====")
         print("num_actors: ", self.num_actors)
-        self.actions_num = self.env.call("act_t_dim")[0]
+        self.actions_num = self.env.call("act_dim")[0]
         print("actions_num: ", self.actions_num)
         self.actions_low = self.env.call("actions_low")[0]
         self.actions_high = self.env.call("actions_high")[0]
         # self.obs_shape = self.env.observation_space.shape
-        self.obs_shape = (self.env.call("obs_t_dim")[0],)
-        self.full_action_dim = self.env.call("act_c_dim")[0]
+        self.obs_shape = (self.env.call("obs_dim")[0],)
+        self.full_action_dim = self.env.call("act_dim")[0]
         # ---- Model ----
         net_config = {
             'actor_units': self.network_config.mlp.units,
@@ -58,8 +59,9 @@ class PPO_Trace(object):
             self.model.parameters(), self.init_lr, eps=1e-5)
         # ---- PPO Train Param ----
         self.e_clip = self.ppo_config['e_clip']
-        self.action_track_denorm = self.ppo_config['action_track_denorm']
-        self.action_catch_denorm = self.ppo_config['action_catch_denorm']
+        # self.action_track_denorm = self.ppo_config['action_track_denorm']
+        # self.action_catch_denorm = self.ppo_config['action_catch_denorm']
+        self.action_trace_denorm = self.ppo_config['action_trace_denorm']
         self.clip_value = self.ppo_config['clip_value']
         self.entropy_coef = self.ppo_config['entropy_coef']
         self.critic_coef = self.ppo_config['critic_coef']
@@ -357,31 +359,38 @@ class PPO_Trace(object):
                         obs["object"]["pos3d"], obs["object"]["v_lin_3d"], 
                         obs["hand"],
                         ), axis=1)
-        else:
+        elif self.env.call('task')[0] == 'Tracing':
             obs_array = np.concatenate((
+                    obs["base"]["pos2d"],
                     obs["base"]["v_lin_2d"], 
+                    obs["arm"]["joint_pos"],
                     obs["arm"]["ee_pos3d"], obs["arm"]["ee_quat"], obs["arm"]["ee_v_lin_3d"],
-                    obs["object"]["pos3d"], obs["object"]["v_lin_3d"],
+                    obs["wire"]["pos3d"], obs["wire"]["quat"],
                     # obs["hand"],# TODO: TEST
                     ), axis=1)
         obs_tensor = torch.tensor(obs_array, dtype=torch.float32).to(self.device)
+        # print("obs_tensor.shape: ", obs_tensor.shape)
         return obs_tensor
 
     def action2dict(self, actions):
         actions = actions.cpu().numpy()
         # De-normalize the actions
-        if self.env.call('task')[0] == 'Tracking':
-            base_tensor = actions[:, :2] * self.action_track_denorm[0]
-            arm_tensor = actions[:, 2:5] * self.action_track_denorm[1]
-            hand_tensor = actions[:, 5:] * self.action_track_denorm[2]
-        else:
-            base_tensor = actions[:, :2] * self.action_catch_denorm[0]
-            arm_tensor = actions[:, 2:5] * self.action_catch_denorm[1]
-            hand_tensor = actions[:, 5:] * self.action_catch_denorm[2]
+        # if self.env.call('task')[0] == 'Tracking':
+        #     base_tensor = actions[:, :2] * self.action_track_denorm[0]
+        #     arm_tensor = actions[:, 2:5] * self.action_track_denorm[1]
+        #     hand_tensor = actions[:, 5:] * self.action_track_denorm[2]
+        # elif self.env.call('task')[0] == 'Tracing':
+        base_tensor = actions[:, :2] * self.action_trace_denorm[0]
+        arm_tensor = actions[:, 2:6] * self.action_trace_denorm[1]
+        # else:
+        #     base_tensor = actions[:, :2] * self.action_catch_denorm[0]
+        #     arm_tensor = actions[:, 2:5] * self.action_catch_denorm[1]
+        #     hand_tensor = actions[:, 5:] * self.action_catch_denorm[2]
+
         actions_dict = {
             'arm': arm_tensor,
             'base': base_tensor,
-            'hand': hand_tensor
+            # 'hand': hand_tensor
         }
         return actions_dict
 
@@ -411,6 +420,7 @@ class PPO_Trace(object):
             actions[:,:] = torch.clamp(actions[:,:], -1, 1)
             actions = torch.nn.functional.pad(actions, (0, self.full_action_dim-actions.size(1)), value=0)
             actions_dict = self.action2dict(actions)
+            # print(actions_dict)
             # print("actions_dict: ", actions_dict)
             obs, r, terminates, truncates, infos = self.env.step(actions_dict)
             # Map the obs
@@ -442,6 +452,16 @@ class PPO_Trace(object):
                 # only log scalars
                 if isinstance(v, float) or isinstance(v, int) or (isinstance(v, torch.Tensor) and len(v.shape) == 0):
                     self.extra_info[k] = v
+            
+            if 'reward_info' in infos and len(infos['reward_info']) > 0:
+                # print("infos['reward_info']: ", infos['reward_info'])
+                for reward_info in infos['reward_info']:
+                    if reward_info is not None:
+                        for k, v in reward_info.items():
+                            # only log scalars
+                            if isinstance(v, float) or isinstance(v, int) or (isinstance(v, torch.Tensor) and len(v.shape) == 0):
+                                self.extra_info['reward_'+k] = v
+                        break
 
             not_dones = 1.0 - self.dones.float()
 

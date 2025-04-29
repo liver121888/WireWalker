@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath('../'))
 sys.path.append(os.path.abspath('./gym_dcmm/'))
 import argparse
 import math
-print(os.getcwd())
+# print(os.getcwd())
 import configs.env.DcmmCfg as DcmmCfg
 import cv2 as cv
 import numpy as np

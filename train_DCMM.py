@@ -44,7 +44,7 @@ def main(config: DictConfig):
 
     cprint('Start Building the Environment', 'green', attrs=['bold'])
     # Create and wrap the environment
-    env_name = 'gym_dcmm/DcmmVecWorld-v0'
+    env_name = 'gym_dcmm/WireWalkerVecWorld-v0'
     if config.task == 'Tracking':
         task = 'Tracking'
     elif config.task == 'Tracing':
@@ -55,13 +55,13 @@ def main(config: DictConfig):
     env = gym.make_vec(env_name, num_envs=int(config.num_envs), 
                     task=task, camera_name=["top"],
                     render_per_step=False, render_mode = "rgb_array",
-                    object_name = "object",
+                    # object_name = "object", object_eval = config.object_eval,
                     img_size = config.train.ppo.img_dim,
                     imshow_cam = config.imshow_cam, 
                     viewer = config.viewer,
                     print_obs = False, print_info = False,
                     print_reward = False, print_ctrl = False,
-                    print_contacts = False, object_eval = config.object_eval,
+                    print_contacts = False, 
                     env_time = 2.5, steps_per_policy = 20)
 
     output_dif = os.path.join('outputs', config.output_name)

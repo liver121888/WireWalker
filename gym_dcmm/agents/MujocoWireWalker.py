@@ -47,7 +47,7 @@ class MJ_WireWalker(object):
     - model: the MuJoCo model of the Dcmm
     - model_arm: the MuJoCo model of the arm
     - viewer: whether to show the viewer of the simulation
-    - object_name: the name of the object in the MuJoCo model
+    - wire_name: the name of the wire in the MuJoCo model
     - timestep: the simulation timestep
     - open_viewer: whether to open the viewer initially
 
@@ -56,15 +56,12 @@ class MJ_WireWalker(object):
                  model=None, 
                  model_arm=None, 
                  viewer=True, 
-                 object_name='object',
-                 object_eval=False, 
                  timestep=0.002):
         self.viewer = None
         self.open_viewer = viewer
         # Load the MuJoCo model
         if model is None:
-            if not object_eval: model_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_DCMM_LEAP_OBJECT_PATH)
-            else: model_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_DCMM_LEAP_UNSEEN_OBJECT_PATH)
+            model_path = os.path.join(WireWalkerCfg.ASSET_PATH, WireWalkerCfg.XML_WIREWALKER_WIRE_PATH)
             self.model_xml_string = xml_to_string(model_path)
         else:
             self.model = model
@@ -82,6 +79,8 @@ class MJ_WireWalker(object):
         # self.data.qpos[21:37] = WireWalkerCfg.hand_joints[:]
         self.data_arm.qpos[0:6] = WireWalkerCfg.arm_joints[:]
 
+        # self.wire_name = wire_name
+
         mujoco.mj_forward(self.model, self.data)
         mujoco.mj_forward(self.model_arm, self.data_arm)
         self.arm_base_pos = self.data.body("arm_base").xpos
@@ -93,17 +92,17 @@ class MJ_WireWalker(object):
 
         ## Get the joint ID for the body, base, arm, hand and object
         # Note: The joint id of the mm body is 0 by default
-        try:
-            _ = self.data.body(object_name)
-        except:
-            print("The object name is not found in the model!\
-                  \nPlease check the object name in the .xml file.")
-            raise ValueError
-        self.object_name = object_name
+        # try:
+        #     _ = self.data.body(object_name)
+        # except:
+        #     print("The object name is not found in the model!\
+        #           \nPlease check the object name in the .xml file.")
+        #     raise ValueError
+        # self.object_name = object_name
         # Get the geom id of the hand, the floor and the object
         # self.hand_start_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, 'mcp_joint') - 1
         self.floor_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, 'floor')
-        self.object_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, self.object_name)
+        # self.object_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, self.object_name)
 
         # Mobile Base Control
         self.rp_base = np.zeros(3)
@@ -285,18 +284,18 @@ class MJ_WireWalker(object):
         result_QP = self.ik_arm.solve(self.model_arm, self.data_arm, Tep, self.data_arm.qpos[0:6])
         return result_QP
 
-    def set_throw_pos_vel(self, 
-                          pose = np.array([0, 0, 0, 1, 0, 0, 0]), 
-                          velocity = np.array([0, 0, 0, 0, 0, 0])):
-        # self.data.qpos[37:44] = pose
-        # self.data.qvel[36:42] = velocity
-        # start from -12
+    # def set_throw_pos_vel(self, 
+    #                       pose = np.array([0, 0, 0, 1, 0, 0, 0]), 
+    #                       velocity = np.array([0, 0, 0, 0, 0, 0])):
+    #     # self.data.qpos[37:44] = pose
+    #     # self.data.qvel[36:42] = velocity
+    #     # start from -12
 
-        # 28, 26
-        # print(len(self.data.qpos))
-        # print(len(self.data.qvel))
-        self.data.qpos[21:28] = pose
-        self.data.qvel[20:26] = velocity
+    #     # 28, 26
+    #     # print(len(self.data.qpos))
+    #     # print(len(self.data.qvel))
+    #     self.data.qpos[21:28] = pose
+    #     self.data.qvel[20:26] = velocity
 
     # def action_hand2qpos(self, action_hand):
     #     """
