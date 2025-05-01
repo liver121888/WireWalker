@@ -908,7 +908,7 @@ class WireWalkerVecEnv(gym.Env):
             mujoco.mj_rnePostConstraint(self.WireWalker.model, self.WireWalker.data)
 
             # Update the contact information
-            # self.contacts = self._get_contacts()
+            self.contacts = self._get_contacts()
             # # Whether the base collides
             if self.contacts["base_contacts"].size != 0:
                 print("Terminating due to base collision")
