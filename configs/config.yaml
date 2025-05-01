@@ -19,8 +19,8 @@ wire_name_eval: 'sine'
 
 # if set domain_rand, wire_name and wire_name_eval is not used, wire will be random select from wire_names in WireWalkcerCfg.py
 # can test with domain_rand on if you want to test with different wires
-domain_rand: False
-wire_name: 'sine'
+domain_rand: True
+wire_name: ''
 
 task: Tracing # Catching_TwoStage, Catching_OneStage, Tracking
 num_envs: 1 # This should be no more than 2x your CPUs (1x is recommended)
@@ -35,7 +35,7 @@ print_contacts: False
 # used to set checkpoint path
 checkpoint_tracking: ''
 checkpoint_catching: ''
-checkpoint_tracing: 'outputs/WireWalker_apr28/2025-04-28/15:23:59/nn/best_reward_2961.28.pth'
+checkpoint_tracing: 'outputs/WireWalker_apr30/2025-04-30/11:05:36/nn/best_reward_1265.27.pth'
 # checkpoint_tracing: ''
 # checkpoint_tracing: 'assets/models/best_reward_3880.76.pth'
 # checkpoint_tracing: 'assets/models/best_reward_4300.32.pth'
@@ -57,7 +57,7 @@ checkpoint_tracing: 'outputs/WireWalker_apr28/2025-04-28/15:23:59/nn/best_reward
 imshow_cam: False
 
 # wandb config
-output_name: WireWalker_apr28
+output_name: WireWalker_apr30
 wandb_mode: "online"  # "online" | "offline" | "disabled"
 wandb_entity: 'wirewalker'
 # wandb_project: 'RL_Dcmm_Track_Random'
