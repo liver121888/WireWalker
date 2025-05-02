@@ -820,7 +820,7 @@ class WireWalkerVecEnv(gym.Env):
         goal_reward = 0
         if self.last_waypoint_idx >= self.waypoint_num - 1:
             goal_reward = WireWalkerCfg.reward_weights["r_goal"]
-            print("Goal Reached!")
+            # print("Goal Reached!")
         reward += goal_reward
         reward_info["goal"] = goal_reward
         
@@ -864,8 +864,8 @@ class WireWalkerVecEnv(gym.Env):
     def _step_mujoco_simulation(self, action_dict):
 
         ## TODO: Low-Pass-Filter the Base Velocity
-        # self.WireWalker.target_base_vel[0:2] = action_dict["base"]
-        self.WireWalker.target_base_vel[0:2] = np.zeros(2)
+        # self.WireWalker.target_base_vel[0:2] = np.zeros(2) #action_dict["base"]
+        self.WireWalker.target_base_vel[0:2] = action_dict["base"]
         action_arm = np.concatenate((action_dict["arm"], np.zeros(2)))
         result_QP, _ = self.WireWalker.move_ee_pose(action_arm)
         if result_QP[1]:
@@ -909,8 +909,9 @@ class WireWalkerVecEnv(gym.Env):
 
             # Update the contact information
             self.contacts = self._get_contacts()
-            # Whether the base collides
+            # # Whether the base collides
             if self.contacts["base_contacts"].size != 0:
+                print("Terminating due to base collision")
                 self.terminated = True
 
             # terminate the episode in advance
@@ -923,7 +924,7 @@ class WireWalkerVecEnv(gym.Env):
         
         while self.last_waypoint_idx < self.waypoint_num and \
                 np.linalg.norm(ee_abs_pose - self.waypoint_pos[self.last_waypoint_idx]) < WireWalkerCfg.WAYPOINT_DIST_EPSILON:
-            print("Moved past waypoint", self.last_waypoint_idx)
+            # print("Moved past waypoint", self.last_waypoint_idx)
             self.last_waypoint_idx += 1
             _num_pts_advanced += 1
         return _num_pts_advanced
@@ -993,6 +994,7 @@ class WireWalkerVecEnv(gym.Env):
         if done:
             # TEST ONLY
             # print("### DONE ###")
+            # print("Truncated: ", truncated, "Terminated: ", terminated)
             self.reset()
             # pass
         return obs, reward, terminated, truncated, info

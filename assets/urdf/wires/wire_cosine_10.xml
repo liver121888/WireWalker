@@ -1,0 +1,212 @@
+<mujoco model="wire_cosine_10">
+  <body name="wire_0">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom name="wire_0" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0"/>
+  </body>
+
+  <body name="wire_1">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom name="wire_1" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="0.23132741228718348 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+  </body>
+
+  <body name="wire_2">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom name="wire_2" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="0.4826548245743669 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+  </body>
+
+  <body name="wire_3">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom name="wire_3" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="0.7339822368615504 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+  </body>
+
+  <body name="wire_4">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom name="wire_4" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="0.9853096491487339 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+  </body>
+
+  <body name="wire_5">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom name="wire_5" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="1.2366370614359172 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+  </body>
+
+  <body name="wire_6">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom name="wire_6" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="1.4879644737231006 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+  </body>
+
+  <body name="wire_7">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom name="wire_7" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="1.739291886010284 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+  </body>
+
+  <body name="wire_8">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom name="wire_8" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="1.9906192982974673 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+  </body>
+
+  <body name="wire_9">
+    <geom type="mesh" mesh="cosine" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1.0" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom name="wire_9" type="mesh" mesh="cosine_collision_0"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_1"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_2"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_3"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_4"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_5"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_6"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_7"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_8"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_9"  group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_10" group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_11" group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_12" group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_13" group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_14" group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_15" group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+    <geom type="mesh" mesh="cosine_collision_16" group="2" rgba="0.0 0.8 0.0 1" pos="2.2419467105846507 0.48 0.45" quat="1.0 0.0 1.2246467991473532e-16 0.0"/>
+  </body>
+
+</mujoco>
