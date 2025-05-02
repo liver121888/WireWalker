@@ -9,7 +9,7 @@ rl_device: ???
 device_id: 0  # 'cuda:?', -1 for 'cpu'
 
 # Disables viewer
-viewer: True
+viewer: False
 # RL Arguments
 test: False # False, True
 
@@ -57,7 +57,7 @@ checkpoint_tracing: ''
 imshow_cam: False
 
 # wandb config
-output_name: WireWalker_may1
+output_name: WireWalker_may2_threeshort
 wandb_mode: "online"  # "online" | "offline" | "disabled"
 wandb_entity: 'wirewalker'
 # wandb_project: 'RL_Dcmm_Track_Random'
