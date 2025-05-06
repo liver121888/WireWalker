@@ -1,0 +1,42 @@
+<mujoco model="wire_straight_10">
+    <body name="wire_0" pos="-0.02 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_0" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+    <body name="wire_1" pos="0.08 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_1" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+    <body name="wire_2" pos="0.18 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_2" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+    <body name="wire_3" pos="0.28 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_3" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+    <body name="wire_4" pos="0.38 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_4" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+    <body name="wire_5" pos="0.48 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_5" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+    <body name="wire_6" pos="0.58 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_6" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+    <body name="wire_7" pos="0.68 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_7" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+    <body name="wire_8" pos="0.78 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_8" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+    <body name="wire_9" pos="0.88 0.48 0.45" quat="1.0 0.0 0.0 0.0">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+        <geom name="wire_9" type="mesh" group="2" rgba="0.0 0.8 0.0 1" mesh="straight_10" />
+    </body>
+</mujoco>

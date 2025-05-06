@@ -74,7 +74,7 @@ def main(config: DictConfig):
                     print_obs=config.print_obs, print_info=config.print_info,
                     print_reward=config.print_reward, print_ctrl=config.print_ctrl,
                     print_contacts=config.print_contacts, wire_name_eval=config.wire_name_eval,
-                    env_time=2.5, steps_per_policy=20,
+                    env_time=15, steps_per_policy=20,
                     device=config.rl_device,
                 )
                 for wire_name in wire_name_list
@@ -91,7 +91,7 @@ def main(config: DictConfig):
                     print_obs = config.print_obs, print_info = config.print_info,
                     print_reward = config.print_reward, print_ctrl = config.print_ctrl,
                     print_contacts = config.print_contacts, wire_name_eval = config.wire_name_eval,
-                    env_time = 2.5, steps_per_policy = 20,
+                    env_time = 15, steps_per_policy = 20,
                     device=config.rl_device,)
 
     # print(envs)

@@ -9,21 +9,21 @@ rl_device: ???
 device_id: 0  # 'cuda:?', -1 for 'cpu'
 
 # Disables viewer
-viewer: True
+viewer: False
 # RL Arguments
-test: True # False, True
+test: False # False, True
 
 # if set wire_name_eval to a value, set to test mode the wire_name_eval will be used, can use this to test unseen wires
 # wire_name_eval: 'cosine'
-wire_name_eval: 'straight'
+wire_name_eval: ''
 
 # if set domain_rand, wire_name and wire_name_eval is not used, wire will be random select from wire_names in WireWalkcerCfg.py
 # can test with domain_rand on if you want to test with different wires
-domain_rand: False
-wire_name: 'straight'
+domain_rand: True
+wire_name: ''
 
 task: Tracing # Catching_TwoStage, Catching_OneStage, Tracking
-num_envs: 1 # This should be no more than 2x your CPUs (1x is recommended)
+num_envs: 8 # This should be no more than 2x your CPUs (1x is recommended)
 # num_envs: 8 # This should be no more than 2x your CPUs (1x is recommended)
 
 print_obs: False
@@ -35,7 +35,7 @@ print_contacts: False
 # used to set checkpoint path
 checkpoint_tracking: ''
 checkpoint_catching: ''
-checkpoint_tracing: 'assets/models/best_reward_1755.79.pth'
+checkpoint_tracing: ''
 # checkpoint_tracing: ''
 # checkpoint_tracing: 'assets/models/best_reward_3880.76.pth'
 # checkpoint_tracing: 'assets/models/best_reward_4300.32.pth'
@@ -57,7 +57,7 @@ checkpoint_tracing: 'assets/models/best_reward_1755.79.pth'
 imshow_cam: False
 
 # wandb config
-output_name: WireWalker_domain_rand_dense_cosine_r_orient
+output_name: WireWalker_may2_threeshort
 wandb_mode: "online"  # "online" | "offline" | "disabled"
 wandb_entity: 'wirewalker'
 # wandb_project: 'RL_Dcmm_Track_Random'

@@ -257,15 +257,22 @@ class MJ_WireWalker(object):
         - The target joint positions of the arm
         """
         self.current_ee_pos[:] = self.data_arm.body(self.ee_link_name).xpos[:]
+        # self.current_ee_quat[:] = [0.5, -0.5, 0.5, -0.5]
         self.current_ee_quat[:] = self.data_arm.body(self.ee_link_name).xquat[:]
+        current_joint6_pos = self.data_arm.qpos[5]
+        # print(self.current_ee_quat)
         target_pos = self.current_ee_pos + delta_pose[0:3]
-        r_delta = R.from_euler('zxy', delta_pose[3:6])
-        r_current = R.from_quat(self.current_ee_quat)
-        target_quat = (r_delta * r_current).as_quat()
+        # r_delta = R.from_euler('zxy', delta_pose[3:6])
+        # # print(r_delta.as_quat())
+        target_quat = self.current_ee_quat
+        # target_quat = (r_delta * r_current).as_quat()
+        # target_quat = self.current_ee_quat
         result_QP = self.ik_arm_solve(target_pos, target_quat)
-        if DEBUG_ARM: print("result_QP: ", result_QP)
+        # print("result_QP: ", result_QP)
         # Update the qpos of the arm with the IK solution
         self.data_arm.qpos[0:6] = result_QP[0]
+        self.data_arm.qpos[5] = max(-3.1, min(3.1, current_joint6_pos + delta_pose[3]))
+        
         mujoco.mj_fwdPosition(self.model_arm, self.data_arm)
         
         # Compute the ee_length

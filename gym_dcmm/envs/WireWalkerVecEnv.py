@@ -190,11 +190,17 @@ class WireWalkerVecEnv(gym.Env):
             if self.WireWalker.viewer:
                 print("Close the previous viewer")
                 self.WireWalker.viewer.close()
+            # Launch passive disables pausing, etc., from the UI.
+            # To test with the joints and pause/unpause from UI, comment out launch_passive lines and uncomment launch lines.
             self.WireWalker.viewer = mujoco.viewer.launch_passive(
                 self.WireWalker.model,
                 self.WireWalker.data,
                 key_callback=env_key_callback,
             )
+            # self.WireWalker.viewer = mujoco.viewer.launch(
+            #     self.WireWalker.model,
+            #     self.WireWalker.data,
+            # )
             # Modify the view position and orientation
             self.WireWalker.viewer.cam.lookat[0:2] = [0, 1]
             self.WireWalker.viewer.cam.distance = 5.0
@@ -814,7 +820,7 @@ class WireWalkerVecEnv(gym.Env):
         goal_reward = 0
         if self.last_waypoint_idx >= self.waypoint_num - 1:
             goal_reward = WireWalkerCfg.reward_weights["r_goal"]
-            print("Goal Reached!")
+            # print("Goal Reached!")
         reward += goal_reward
         reward_info["goal"] = goal_reward
         
@@ -858,6 +864,7 @@ class WireWalkerVecEnv(gym.Env):
     def _step_mujoco_simulation(self, action_dict):
 
         ## TODO: Low-Pass-Filter the Base Velocity
+        # self.WireWalker.target_base_vel[0:2] = np.zeros(2) #action_dict["base"]
         self.WireWalker.target_base_vel[0:2] = action_dict["base"]
         action_arm = np.concatenate((action_dict["arm"], np.zeros(2)))
         result_QP, _ = self.WireWalker.move_ee_pose(action_arm)
@@ -902,8 +909,9 @@ class WireWalkerVecEnv(gym.Env):
 
             # Update the contact information
             self.contacts = self._get_contacts()
-            # Whether the base collides
+            # # Whether the base collides
             if self.contacts["base_contacts"].size != 0:
+                print("Terminating due to base collision")
                 self.terminated = True
 
             # terminate the episode in advance
@@ -916,7 +924,7 @@ class WireWalkerVecEnv(gym.Env):
         
         while self.last_waypoint_idx < self.waypoint_num and \
                 np.linalg.norm(ee_abs_pose - self.waypoint_pos[self.last_waypoint_idx]) < WireWalkerCfg.WAYPOINT_DIST_EPSILON:
-            print("Moved past waypoint", self.last_waypoint_idx)
+            # print("Moved past waypoint", self.last_waypoint_idx)
             self.last_waypoint_idx += 1
             _num_pts_advanced += 1
         return _num_pts_advanced
@@ -942,7 +950,7 @@ class WireWalkerVecEnv(gym.Env):
             ):
                 self.terminated = True
         elif self.task == "Tracing":
-            if self.last_waypoint_idx == self.waypoint_num:
+            if self.last_waypoint_idx >= self.waypoint_num - 1:
                 print("### Tracing Success!!!")
                 self.terminated = True
 
@@ -986,6 +994,7 @@ class WireWalkerVecEnv(gym.Env):
         if done:
             # TEST ONLY
             # print("### DONE ###")
+            # print("Truncated: ", truncated, "Terminated: ", terminated)
             self.reset()
             # pass
         return obs, reward, terminated, truncated, info
@@ -1093,6 +1102,8 @@ class WireWalkerVecEnv(gym.Env):
         # action = np.zeros(18)
         action = np.zeros(6)
         total_reward = 0.0
+        # count = 0
+        # dir = 1
         while True:
             # Note: action's dim = 18, which includes 2 for the base, 4 for the arm, and 12 for the hand
             # Keyboard control
@@ -1112,6 +1123,10 @@ class WireWalkerVecEnv(gym.Env):
             #     action[6:18] = np.zeros(12)
             base_tensor = action[:2]
             arm_tensor = action[2:6]
+            # count += 1
+            # if count % 100 == 0:
+            #     dir *= -1
+            # arm_tensor[-1] = dir * 0.03
             # hand_tensor = action[6:18]
             actions_dict = {
                 "arm": arm_tensor,
